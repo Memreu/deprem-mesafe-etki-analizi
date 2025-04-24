@@ -35,7 +35,7 @@ pip install folium geopy colorama
 
 ---
 
-🚀 Kullanım
+## 🚀 Kullanım
 Uygulama çalıştırıldığında:
 - 1.Depremin episantr koordinatlarını girin (örn: 39°49'39.0"N 30°32'26.9"E)
 - 2.Birden fazla analiz yapılacak konum ekleyin.
@@ -48,7 +48,7 @@ Sonuçlar:
 
 --- 
 
-📸 Örnek Harita Çıktısı
+## 📸 Örnek Harita Çıktısı
 Harita açıklamaları:
 - 🔴 Kırmızı: Deprem merkez üssü
 - 🔵 Mavi: Kullanıcı konumları
@@ -58,7 +58,7 @@ Harita açıklamaları:
 
 ---
 
-📚 Bilimsel Arka Plan
+## 📚 Bilimsel Arka Plan
 **MMI Hesabı:**
 - MMI = 1.62 + 1.22Mw - 0.00255R - 1.29log10(R)
 - Bu formül, hiposantr uzaklığına göre zayıflayan deprem ivmesini baz alır.
@@ -66,12 +66,12 @@ Harita açıklamaları:
 -- **R**: Hiposantr uzaklığı (km)
 > Formül, depremin şiddetinin mesafeye ve büyüklüğe göre logaritmik olarak zayıflamasına dayalıdır.
 
-**Yaklaşık Mw Hesabı:**
+#### **Yaklaşık Mw Hesabı:**
 - MMI değerinden yaklaşık olarak hissedilen Mw değeri tahmin edilir. Bu tahmin, ampirik ilişkilere dayalıdır ve mühendislik hesaplamalarına referans niteliğindedir.
 - Bu sistem yalnızca deprem büyüklüğü ve mesafeye göre analiz yapar. Zemin tipi, yapı dayanımı gibi faktörleri içermemektedir.
 
 ---
-🔗 Kaynaklar ve Referanslar
+## 🔗 Kaynaklar ve Referanslar
 
 - 📊 AFAD Türkiye Deprem Tehlike Haritası (TDTH)
 - 🧭 MTA Yerbilimleri Veri Portalı
@@ -80,7 +80,7 @@ Harita açıklamaları:
 
 ---
 
-🤝 Katkı
+## 🤝 Katkı
 Her türlü katkıya açığız! Şunları yapabilirsin:
 
 - 📥 Gerçek PGA ve zemin verileriyle entegrasyon
@@ -90,7 +90,7 @@ Her türlü katkıya açığız! Şunları yapabilirsin:
 
 ---
 
-🧠 Lisans
+## 🧠 Lisans
 - MIT Lisansı ile lisanslanmıştır.
 - Lütfen AFAD ve MTA kaynaklarını kullandığınızda uygun atıfta bulunun.
 
