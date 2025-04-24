@@ -54,6 +54,8 @@ Harita açıklamaları:
 🔵 Mavi: Kullanıcı konumları
 🟠 Turuncu çizgiler: Merkez ile konum arasındaki bağlantılar
 💬 Popup: Tahmini MMI ve mesafe bilgileri
+![image](https://github.com/user-attachments/assets/f2819266-d82e-41e2-9196-3a1448202527)
+
 ---
 
 📚 Bilimsel Arka Plan
