@@ -1,6 +1,6 @@
 # 🌍 MMI Intensity Mapper
 
-Bu proje, kullanıcıdan alınan deprem ve konum bilgileri ile **deprem büyüklüğü**, **merkez üssüne uzaklık** ve **derinlik** temelinde **MMI (Modified Mercalli Intensity)** değerini hesaplayıp **interaktif bir harita** üzerinde görselleştirmeyi amaçlar.
+**MMI Intensity Mapper**, kullanıcıdan alınan deprem ve konum bilgilerini kullanarak, sarsıntının farklı noktalarda nasıl hissedildiğini tahmin eden bir analiz ve görselleştirme aracıdır. Uygulama, deprem büyüklüğü (**Mw**), episantr uzaklığı ve derinlik bilgilerini temel alarak **Modified Mercalli Intensity (MMI)** değerini hesaplar ve sonuçları **etkileşimli bir HTML haritası** üzerinde görsel olarak sunar.
 
 > Proje Python ile geliştirilmiş olup, haritalama için `folium`, mesafe hesaplamaları için `geopy`, renkli terminal çıktısı için `colorama` kullanmaktadır.
 
@@ -8,22 +8,26 @@ Bu proje, kullanıcıdan alınan deprem ve konum bilgileri ile **deprem büyükl
 
 ## 📌 Özellikler
 
-- 📍 **DMS formatında (örn: `40°14'56.6"N`) koordinat girişi**
-- 🧮 Deprem merkezinden konuma:
-  - **Yüzeysel (episantr) mesafe**
-  - **Hiposantrik mesafe**
-  - **Tahmini MMI değeri**
-  - **Renkli MMI açıklaması**
-  - **Yaklaşık Mw (moment magnitüdü) karşılığı**
-- 🌐 Interaktif HTML harita çıktısı
-- 🎨 Terminalde renkli çıktılar
-- 📏 Konumlar arası çizgiler ile görsel bağlantı
+- 📍 **DMS formatında koordinat girişi**  
+  Kullanıcılar hem deprem episantrı hem de analiz yapılacak konumları DMS (derece, dakika, saniye) formatında girebilirler.
+  
+- 🧭 **Yüzeysel ve hiposantrik mesafe hesaplamaları**  
+  En doğru sismik analiz için yer yüzeyinden ve yer altındaki depremin merkezine olan uzaklıklar hesaplanır.
+
+- 📈 **MMI ve Mw hesaplamaları**  
+  Kullanıcının verdiği Mw değeriyle MMI hesaplanır. Aynı zamanda hissedilen MMI'dan geri tahminle yaklaşık Mw da verilir.
+
+- 🎨 **Terminalde renkli çıktı**  
+  MMI şiddeti kullanıcıya renkli ve anlamlı açıklamalarla sunulur (örn: Hafif, Orta, Yıkıcı).
+
+- 🗺️ **Etkileşimli harita çıktısı**  
+  Folium kullanılarak oluşturulan HTML haritada deprem ve kullanıcı konumları işaretlenir, mesafeler ve tahmini etkiler gösterilir.
 
 ---
 
 ## 🛠️ Kurulum
 
-Gerekli kütüphaneler script içinde otomatik kurulur. Manuel kurulum yapmak istersen:
+Bu proje pek çok Python ile çalışır. Kütüphaneler script içerisinde otomatik olarak kurulsa da manuel kurulum için:
 
 ```bash
 pip install folium geopy colorama
@@ -31,40 +35,46 @@ pip install folium geopy colorama
 
 ---
 
-## 🚀 Kullanım
+🚀 Kullanım
 Uygulama çalıştırıldığında:
+1.Depremin episantr koordinatlarını girin (örn: 39°49'39.0"N 30°32'26.9"E)
+2.Birden fazla analiz yapılacak konum ekleyin.
+3.Depremin derinliği ve moment büyüklüğünü (Mw) girin.
 
--Depremin episantr koordinatlarını (DMS formatında) girin.
--Birden fazla konum girerek analiz yapabilirsiniz.
--Depremin derinliği ve moment büyüklüğünü (Mw) belirtin.
--Sonuçlar hem terminalde hem de deprem_haritasi.html dosyasında görsel olarak gösterilecektir.
-
+Sonuçlar:
+📊 Terminalde açıklamalı olarak sunulur.
+🗺️ Harita üzerinde görsel olarak sunulur. (deprem_haritasi.html)
+Harita, çalıştırılan dizine kaydedilir ve otomatik olarak tarayıcıda açılır.
 
 --- 
 
 📸 Örnek Harita Çıktısı
-
-Haritada: Deprem noktası (kırmızı), kullanıcı konumları (mavi), MMI değerine göre bağlantı çizgileri.
-
+Harita açıklamaları:
+🔴 Kırmızı: Deprem merkez üssü
+🔵 Mavi: Kullanıcı konumları
+🟠 Turuncu çizgiler: Merkez ile konum arasındaki bağlantılar
+💬 Popup: Tahmini MMI ve mesafe bilgileri
 ---
 
 📚 Bilimsel Arka Plan
 MMI Hesabı:
 MMI = 1.62 + 1.22Mw - 0.00255R - 1.29log10(R)
 Bu formül, hiposantr uzaklığına göre zayıflayan deprem ivmesini baz alır.
+**Mw**: Moment büyüklüğü
+**R**: Hiposantr uzaklığı (km)
+> Formül, depremin şiddetinin mesafeye ve büyüklüğe göre logaritmik olarak zayıflamasına dayalıdır.
 
-Yaklaşık Mw tahmini:
-MMI değerine karşılık gelen ortalama moment büyüklüğü hesaplanır.
-
+Yaklaşık Mw Hesabı:
+MMI değerinden yaklaşık olarak hissedilen Mw değeri tahmin edilir. Bu tahmin, ampirik ilişkilere dayalıdır ve mühendislik hesaplamalarına referans niteliğindedir.
 Bu sistem yalnızca deprem büyüklüğü ve mesafeye göre analiz yapar. Zemin tipi, yapı dayanımı gibi faktörleri içermemektedir.
 
 ---
-
 🔗 Kaynaklar ve Referanslar
-AFAD Türkiye Deprem Tehlike Haritası  
-MTA Yer Bilimleri Portalı
-Boore et al. (1997): Ground motion prediction equations
-USGS MMI Explanation
+
+📊 AFAD Türkiye Deprem Tehlike Haritası (TDTH)
+🧭 MTA Yerbilimleri Veri Portalı
+📘 USGS MMI Açıklamaları
+📄 Boore et al. (1997) — Zemin ivme tahmin denklemleri (GMPE)
 
 ---
 
