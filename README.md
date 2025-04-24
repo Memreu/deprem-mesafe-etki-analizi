@@ -37,66 +37,66 @@ pip install folium geopy colorama
 
 🚀 Kullanım
 Uygulama çalıştırıldığında:
-1.Depremin episantr koordinatlarını girin (örn: 39°49'39.0"N 30°32'26.9"E)
-2.Birden fazla analiz yapılacak konum ekleyin.
-3.Depremin derinliği ve moment büyüklüğünü (Mw) girin.
+- 1.Depremin episantr koordinatlarını girin (örn: 39°49'39.0"N 30°32'26.9"E)
+- 2.Birden fazla analiz yapılacak konum ekleyin.
+- 3.Depremin derinliği ve moment büyüklüğünü (Mw) girin.
 
 Sonuçlar:
-📊 Terminalde açıklamalı olarak sunulur.
-🗺️ Harita üzerinde görsel olarak sunulur. (deprem_haritasi.html)
-Harita, çalıştırılan dizine kaydedilir ve otomatik olarak tarayıcıda açılır.
+- 📊 Terminalde açıklamalı olarak sunulur.
+- 🗺️ Harita üzerinde görsel olarak sunulur. (deprem_haritasi.html)
+- Harita, çalıştırılan dizine kaydedilir ve otomatik olarak tarayıcıda açılır.
 
 --- 
 
 📸 Örnek Harita Çıktısı
 Harita açıklamaları:
-🔴 Kırmızı: Deprem merkez üssü
-🔵 Mavi: Kullanıcı konumları
-🟠 Turuncu çizgiler: Merkez ile konum arasındaki bağlantılar
-💬 Popup: Tahmini MMI ve mesafe bilgileri
+- 🔴 Kırmızı: Deprem merkez üssü
+- 🔵 Mavi: Kullanıcı konumları
+- 🟠 Turuncu çizgiler: Merkez ile konum arasındaki bağlantılar
+- 💬 Popup: Tahmini MMI ve mesafe bilgileri
 ![image](https://github.com/user-attachments/assets/f2819266-d82e-41e2-9196-3a1448202527)
 
 ---
 
 📚 Bilimsel Arka Plan
-MMI Hesabı:
-MMI = 1.62 + 1.22Mw - 0.00255R - 1.29log10(R)
-Bu formül, hiposantr uzaklığına göre zayıflayan deprem ivmesini baz alır.
-**Mw**: Moment büyüklüğü
-**R**: Hiposantr uzaklığı (km)
+**MMI Hesabı:**
+- MMI = 1.62 + 1.22Mw - 0.00255R - 1.29log10(R)
+- Bu formül, hiposantr uzaklığına göre zayıflayan deprem ivmesini baz alır.
+-- **Mw**: Moment büyüklüğü
+-- **R**: Hiposantr uzaklığı (km)
 > Formül, depremin şiddetinin mesafeye ve büyüklüğe göre logaritmik olarak zayıflamasına dayalıdır.
 
-Yaklaşık Mw Hesabı:
-MMI değerinden yaklaşık olarak hissedilen Mw değeri tahmin edilir. Bu tahmin, ampirik ilişkilere dayalıdır ve mühendislik hesaplamalarına referans niteliğindedir.
-Bu sistem yalnızca deprem büyüklüğü ve mesafeye göre analiz yapar. Zemin tipi, yapı dayanımı gibi faktörleri içermemektedir.
+**Yaklaşık Mw Hesabı:**
+- MMI değerinden yaklaşık olarak hissedilen Mw değeri tahmin edilir. Bu tahmin, ampirik ilişkilere dayalıdır ve mühendislik hesaplamalarına referans niteliğindedir.
+- Bu sistem yalnızca deprem büyüklüğü ve mesafeye göre analiz yapar. Zemin tipi, yapı dayanımı gibi faktörleri içermemektedir.
 
 ---
 🔗 Kaynaklar ve Referanslar
 
-📊 AFAD Türkiye Deprem Tehlike Haritası (TDTH)
-🧭 MTA Yerbilimleri Veri Portalı
-📘 USGS MMI Açıklamaları
-📄 Boore et al. (1997) — Zemin ivme tahmin denklemleri (GMPE)
+- 📊 AFAD Türkiye Deprem Tehlike Haritası (TDTH)
+- 🧭 MTA Yerbilimleri Veri Portalı
+- 📘 USGS MMI Açıklamaları
+- 📄 Boore et al. (1997) — Zemin ivme tahmin denklemleri (GMPE)
 
 ---
 
 🤝 Katkı
 Her türlü katkıya açığız! Şunları yapabilirsin:
 
-📥 Gerçek PGA ve zemin verileriyle entegrasyon
-🌍 Raster veri destekli analiz (AFAD WMS, MTA TIFF)
-🖼️ GUI arayüz geliştirme (Tkinter, PyQt)
-📄 PDF rapor çıktısı oluşturma
+- 📥 Gerçek PGA ve zemin verileriyle entegrasyon
+- 🌍 Raster veri destekli analiz (AFAD WMS, MTA TIFF)
+- 🖼️ GUI arayüz geliştirme (Tkinter, PyQt)
+- 📄 PDF rapor çıktısı oluşturma
 
 ---
 
 🧠 Lisans
-MIT Lisansı ile lisanslanmıştır.
-Lütfen AFAD ve MTA kaynaklarını kullandığınızda uygun atıfta bulunun.
+- MIT Lisansı ile lisanslanmıştır.
+- Lütfen AFAD ve MTA kaynaklarını kullandığınızda uygun atıfta bulunun.
 
 
 ---
 
->👨‍💻 Hazırlayan: Mehmet Emre Ünlü
-📅 Proje Başlangıcı: 2025
-📍 Türkiye
+> - 👨‍💻 Hazırlayan: Mehmet Emre Ünlü
+- 📅 Proje Başlangıcı: 2025
+- 📍 Türkiye
