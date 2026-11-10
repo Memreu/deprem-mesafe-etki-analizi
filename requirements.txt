@@ -1,4 +1,22 @@
+# Çekirdek
 numpy>=1.26
 pandas>=2.1
+scipy>=1.11
+shapely>=2.0
+pyproj~=3.7.2
 folium>=0.17
-pytest>=8
+rasterio>=1.3
+
+# OpenQuake hazardlib çalışma zamanı bağımlılıkları.
+# openquake.engine paketinin kendisi GDAL'ı kaynaktan derlemeye çalıştığı için
+# bağımlılıksız kurulur:  pip install --no-deps openquake.engine==3.26.2
+h5py>=3.10
+toml
+decorator
+psutil
+numba>=0.59
+alpha_shapes
+h3>=4
+requests
+fiona>=1.9
+geopandas>=0.14

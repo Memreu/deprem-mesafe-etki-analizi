@@ -1,4 +1,9 @@
-"""Etkileşimli komut satırı arayüzü (projenin orijinal kullanım biçimi)."""
+"""Komut satırı arayüzü.
+
+Etkileşimli:   python "1.1.MMI Intensity Mapper.py"
+Argümanlarla:  python -m mmi_mapper.cli --mag 7.8 --lat 37.226 --lon 37.014 --depth 10 \
+                   --site 37.5753,36.9228 --site 36.2023,36.1613
+"""
 
 from __future__ import annotations
 
@@ -7,8 +12,8 @@ import webbrowser
 
 import numpy as np
 
-from . import ipe
-from .coords import haversine_km, hypocentral_km, parse_coordinate
+from .coords import parse_coordinate
+from .model import MODEL_LABELS, Event, run_scenario
 from .scale import describe, to_roman
 
 
@@ -16,22 +21,10 @@ def _ask_float(prompt: str) -> float:
     return float(input(prompt).replace(",", "."))
 
 
-def point_source_table(mw: float, depth: float, eq_lat: float, eq_lon: float, sites: list[tuple[float, float]]):
-    """Nokta kaynak IPE tahminleri (Aşama 0 modelleri)."""
-    lat = np.array([s[0] for s in sites])
-    lon = np.array([s[1] for s in sites])
-    repi = haversine_km(eq_lat, eq_lon, lat, lon)
-    rhyp = hypocentral_km(repi, depth)
-    allen, allen_sd = ipe.allen2012_rhyp(mw, rhyp)
-    bayrak, bayrak_sd = ipe.bayrak2019(mw, repi, depth, "R3")
-    legacy, _ = ipe.legacy_unverified(mw, repi, depth)
-    return dict(lat=lat, lon=lon, repi=repi, rhyp=rhyp, allen=allen, allen_sd=allen_sd,
-                bayrak=bayrak, bayrak_sd=bayrak_sd, legacy=legacy)
-
-
-def interactive() -> None:
+def _interactive_inputs():
     print("\n📘 Episantral uzaklık: yüzeyde episantra olan uzaklık.")
-    print("📘 Hiposantral uzaklık: depremin yer altındaki odağına (hiposantr) olan uzaklık.\n")
+    print("📘 Hiposantral uzaklık: depremin yer altındaki odağına (hiposantr) olan uzaklık.")
+    print("📘 Rjb / Rrup: fayın yüzey izdüşümüne / fay yüzeyine en yakın uzaklık (Mw ≥ 6.5'te sonlu fay).\n")
     print("📍 Episantr koordinatları (ondalık 37.226 ya da DMS 37°13'33.6\"N):")
     eq_lat = parse_coordinate(input("Enlem: "))
     eq_lon = parse_coordinate(input("Boylam: "))
@@ -46,37 +39,60 @@ def interactive() -> None:
         raise ValueError("En az bir konum girmelisiniz.")
     depth = _ask_float("\n🌐 Derinlik (km): ")
     mw = _ask_float("🔢 Moment büyüklüğü (Mw): ")
-    run(mw, depth, eq_lat, eq_lon, sites)
+    return Event(mag=mw, lat=eq_lat, lon=eq_lon, depth=depth), sites
 
 
-def run(mw, depth, eq_lat, eq_lon, sites, html="deprem_haritasi.html", open_browser=True):
-    t = point_source_table(mw, depth, eq_lat, eq_lon, sites)
-    for i in range(len(sites)):
-        label, _ = describe(t["allen"][i])
-        print(f"\n👤 Konum {i + 1}")
-        print(f"  {'Episantral uzaklık':<28}: {t['repi'][i]:.1f} km")
-        print(f"  {'Hiposantral uzaklık':<28}: {t['rhyp'][i]:.1f} km")
-        print(f"  {'Allen vd. 2012 (Rhyp)':<28}: {t['allen'][i]:.2f} ± {t['allen_sd'][i]:.2f} → {to_roman(t['allen'][i])} ({label})")
-        print(f"  {'Bayrak vd. 2019 (R3)':<28}: {t['bayrak'][i]:.2f} ± {t['bayrak_sd'][i]:.2f} → {to_roman(t['bayrak'][i])}")
-        print(f"  {'Eski formül (doğrulanmamış)':<28}: {t['legacy'][i]:.2f}")
-    try:
-        from .mapping import simple_map
-    except ImportError:
-        return t
-    m = simple_map(eq_lat, eq_lon, t)
-    m.save(html)
-    print(f"\n🗺️  Harita kaydedildi: {html}")
-    if open_browser:
-        webbrowser.open(html)
-    return t
+def report(df, models=("allen2012_rrup", "bayrak2019", "kale2015_wgrw12", "legacy")) -> None:
+    print(f"\nKaynak: {df.attrs.get('rupture_source')} | Vs30: {df.attrs.get('vs30_source')}")
+    for i, r in df.reset_index(drop=True).iterrows():
+        print(f"\n👤 Konum {i + 1}  ({r.lat:.4f}, {r.lon:.4f})")
+        print(f"  Repi {r.repi:.1f} km · Rhyp {r.rhyp:.1f} km · Rjb {r.rjb:.1f} km · Rrup {r.rrup:.1f} km · Vs30 {r.vs30:.0f} m/s")
+        for m in models:
+            if m not in df:
+                continue
+            mu, sd = r[m], r.get(f"{m}_sd", np.nan)
+            sd_txt = "" if np.isnan(sd) else f" ± {sd:.2f}"
+            label = describe(mu)[0] if m != "legacy" else "doğrulanmamış"
+            print(f"  {MODEL_LABELS[m]:<34}: {mu:5.2f}{sd_txt}  → {to_roman(mu)} ({label})")
+
+
+def run(event: Event, sites, vs30=None, html="deprem_haritasi.html", open_browser=True, rupture_geojson=None):
+    lat = [s[0] for s in sites]
+    lon = [s[1] for s in sites]
+    df, rup = run_scenario(event, lat, lon, vs30=vs30, rupture_geojson=rupture_geojson)
+    report(df)
+    if html:
+        from .mapping import scenario_map
+
+        scenario_map(event, df, rup).save(html)
+        print(f"\n🗺️  Harita kaydedildi: {html}")
+        if open_browser:
+            webbrowser.open(html)
+    return df, rup
 
 
 def main(argv=None) -> None:
     p = argparse.ArgumentParser(description="MMI Intensity Mapper")
+    p.add_argument("--mag", type=float)
+    p.add_argument("--lat")
+    p.add_argument("--lon")
+    p.add_argument("--depth", type=float, default=10.0)
+    p.add_argument("--rake", type=float, default=None)
+    p.add_argument("--site", action="append", default=[], help="enlem,boylam (tekrarlanabilir)")
+    p.add_argument("--vs30", type=float, default=None, help="tüm noktalar için sabit Vs30 (m/s)")
+    p.add_argument("--rupture", default=None, help="3B fay GeoJSON'u (USGS FFM / ShakeMap rupture.json)")
+    p.add_argument("--html", default="deprem_haritasi.html")
     p.add_argument("--no-browser", action="store_true")
     a = p.parse_args(argv)
     try:
-        interactive()
+        if a.mag is None:
+            event, sites = _interactive_inputs()
+        else:
+            event = Event(mag=a.mag, lat=parse_coordinate(a.lat), lon=parse_coordinate(a.lon), depth=a.depth, rake=a.rake)
+            sites = [tuple(parse_coordinate(v) for v in s.split(",")) for s in a.site]
+            if not sites:
+                raise ValueError("En az bir --site girin.")
+        run(event, sites, vs30=a.vs30, html=a.html, open_browser=not a.no_browser, rupture_geojson=a.rupture)
     except ValueError as e:
         print(f"⚠️ Hata: {e}")
 

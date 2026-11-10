@@ -7,19 +7,34 @@ import folium
 from .scale import describe, to_roman
 
 
-def simple_map(eq_lat: float, eq_lon: float, table: dict) -> folium.Map:
-    """Nokta kaynak sonuçları için basit harita (deprem + konumlar)."""
-    m = folium.Map(location=[eq_lat, eq_lon], zoom_start=7, tiles="OpenStreetMap")
-    folium.Marker([eq_lat, eq_lon], tooltip="Episantr", icon=folium.Icon(color="red", icon="info-sign")).add_to(m)
-    for i, (la, lo) in enumerate(zip(table["lat"], table["lon"]), 1):
-        mmi = float(table["allen"][i - 1])
+def _rupture_layer(rup, name="Fay (sonlu kaynak)"):
+    fg = folium.FeatureGroup(name=name)
+    if rup is not None and rup.is_finite:
+        for ring in rup.outline_lonlat():
+            folium.Polygon(ring, color="#7a0019", weight=1, fill=True, fill_opacity=0.15).add_to(fg)
+        for seg in rup.trace_lonlat():
+            folium.PolyLine([(la, lo) for lo, la in seg], color="#7a0019", weight=4,
+                            tooltip=f"{rup.source} · L={rup.length:.0f} km").add_to(fg)
+    return fg
+
+
+def scenario_map(event, df, rup=None, model="allen2012_rrup") -> folium.Map:
+    """Senaryo noktaları + fay + episantr."""
+    m = folium.Map(location=[event.lat, event.lon], zoom_start=7, tiles="OpenStreetMap")
+    folium.Marker([event.lat, event.lon], tooltip=f"Episantr · Mw {event.mag}",
+                  icon=folium.Icon(color="red", icon="info-sign")).add_to(m)
+    _rupture_layer(rup).add_to(m)
+    fg = folium.FeatureGroup(name="Konumlar")
+    for i, r in df.reset_index(drop=True).iterrows():
+        mmi = float(r[model])
         label, color = describe(mmi)
-        html = (f"<b>Konum {i}</b><br>Repi: {table['repi'][i-1]:.1f} km<br>"
-                f"Allen 2012: {mmi:.2f} ({to_roman(mmi)}, {label})<br>"
-                f"Bayrak 2019: {table['bayrak'][i-1]:.2f}")
-        folium.CircleMarker([la, lo], radius=8, color="#333", weight=1, fill=True, fill_color=color,
-                            fill_opacity=0.9, popup=folium.Popup(html, max_width=260),
-                            tooltip=f"Konum {i}: MMI {to_roman(mmi)}").add_to(m)
-        folium.PolyLine([(eq_lat, eq_lon), (la, lo)], color="orange", weight=2,
-                        tooltip=f"{table['repi'][i-1]:.1f} km").add_to(m)
+        rows = "".join(f"<tr><td>{k}</td><td>{r[k]:.2f}</td></tr>" for k in
+                       ("allen2012_rrup", "bayrak2019", "kale2015_wgrw12") if k in r)
+        html = (f"<b>Konum {i + 1}</b><br>Repi {r.repi:.1f} km · Rrup {r.rrup:.1f} km · Vs30 {r.vs30:.0f}"
+                f"<table>{rows}</table>")
+        folium.CircleMarker([r.lat, r.lon], radius=8, color="#333", weight=1, fill=True, fill_color=color,
+                            fill_opacity=0.9, popup=folium.Popup(html, max_width=280),
+                            tooltip=f"Konum {i + 1}: MMI {to_roman(mmi)} ({label})").add_to(fg)
+    fg.add_to(m)
+    folium.LayerControl().add_to(m)
     return m
