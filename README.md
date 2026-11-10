@@ -22,7 +22,7 @@ Olmuş bir depremin büyüklüğü, konumu ve derinliğinden, farklı noktalarda
 
 <p align="center"><img src="images/kahramanmaras_mmi_map.png" width="100%"></p>
 
-> 🇬🇧 **In English:** A lightweight, documented and validated rapid-intensity tool for Türkiye. It replaces an unsourced legacy formula with published models: Allen, Wald & Worden (2012) and Bayrak et al. (2019) IPEs, plus a Kale et al. (2015) GMPE → Worden et al. (2012) / Bilal & Askan (2014) GMICE chain run through OpenQuake. Large events use a finite fault built from GEM active-fault traces and Thingbaijam et al. (2017) scaling. A four-branch logic tree yields 16/50/84th percentiles and P(MMI ≥ VII/VIII). For the 2023 Kahramanmaraş Mw 7.8 and 7.5 earthquakes (552 USGS DYFI, AFAD and KOERI observations), the legacy formula over-predicts by **1.75 MMI** (RMSE 2.05), while Allen et al. (2012) with the USGS rupture has a bias of **+0.10** (RMSE 0.89). Within 50 km of the fault, the automatically built GEM-based rupture (logic-tree RMSE 1.09) performs almost as well as the USGS ShakeMap rupture (1.05), whereas a point source gives 2.26. Across 18 Turkish Mw ≥ 6 earthquakes recorded by KOERI, the GMPE+GMICE chain has a bias of **−0.17** (RMSE 0.69). A monotonic-constrained LightGBM residual model, validated with event-grouped CV, lowers out-of-fold RMSE from **0.68 to 0.45** across 949 records. Outputs include a PAGER-style population exposure table, a layered Folium map, a Streamlit app and CI tests that check the IPEs against OpenQuake.
+> 🇬🇧 **In English:** A lightweight, documented and validated rapid-intensity tool for Türkiye. It replaces an unsourced legacy formula with published models: Allen, Wald & Worden (2012) and Bayrak et al. (2019) IPEs, plus a Kale et al. (2015) GMPE → Worden et al. (2012) / Bilal & Askan (2014) GMICE chain run through OpenQuake. Large events use a finite fault built from GEM active-fault traces and Thingbaijam et al. (2017) scaling. A four-branch logic tree yields 16/50/84th percentiles and P(MMI ≥ VII/VIII). Across six large earthquakes (Kahramanmaraş 2023 ×2, Elazığ 2020, Samos 2020, Düzce 1999, İzmit 1999; 1,324 USGS DYFI, field-intensity and strong-motion observations), the legacy formula over-predicts by **2.0 MMI** (RMSE 2.29), while the logic tree has a bias of **−0.11** (RMSE 0.93). Within 50 km of the fault, the automatically built GEM-based rupture (logic-tree RMSE 1.24) performs almost as well as the USGS rupture (1.17), whereas a point source gives 1.59; for Kahramanmaraş alone the values are 1.10, 1.07 and 2.26. A monotonic-constrained LightGBM residual model, validated with event-grouped CV, lowers out-of-fold RMSE from **0.68 to 0.45** across 949 records. Outputs include a PAGER-style population exposure table, a layered Folium map, a Streamlit app and CI tests that check the IPEs against OpenQuake.
 
 <details>
 <summary><b>📑 İçindekiler</b></summary>
@@ -45,14 +45,14 @@ Olmuş bir depremin büyüklüğü, konumu ve derinliğinden, farklı noktalarda
 
 | | Sonuç |
 |---|---|
-| ❌ **Eski formül** | Kaynağı bulunamadı. Kahramanmaraş 2023'te 552 gözlemde ortalama **1,75 MMI fazla** (RMSE 2,05), Türkiye Mw ≥ 6 depremlerinde **2,4 MMI fazla** tahmin ediyor |
+| ❌ **Eski formül** | Kaynağı bulunamadı. Altı büyük depremde (1 324 gözlem) ortalama **2,0 MMI fazla** tahmin ediyor (RMSE 2,29); altı depremin hepsinde en kötü model |
 | 📐 **Yerine gelen modeller** | Allen 2012 (Rrup/Rhyp), Bayrak 2019 (Türkiye), Kale 2015 → WGRW12 / Bilal & Askan 2014 |
-| 🎯 **En iyi modeller** | Kahramanmaraş (DYFI + AFAD + KOERI): Allen 2012 Rrup sapma **+0,10**, RMSE **0,89** · Türkiye Mw ≥ 6 (KOERI): Kale 2015 → WGRW12 sapma **−0,17**, RMSE **0,69** |
-| 🧭 **Sonlu fay** | Fay boyunca 50 km içinde RMSE: nokta kaynak **2,26** → otomatik GEM fayı **1,09** ≈ USGS ShakeMap fayı **1,05**. Antakya'ya episantral uzaklık 137 km, fay uzaklığı 20 km |
+| 🎯 **En iyi modeller** | Altı deprem: mantık ağacı sapma **−0,11**, RMSE **0,93**; Allen 2012 Rrup 0,95; Kale 2015 → WGRW12 0,99 · Kahramanmaraş: mantık ağacı ve Allen 2012 RMSE **0,88** |
+| 🧭 **Sonlu fay** | Kahramanmaraş'ta faya 50 km içinde RMSE: nokta kaynak **2,26** → otomatik GEM fayı **1,10** ≈ USGS fayı **1,07** |
 | 🎲 **Belirsizlik** | 4 dallı mantık ağacı · %16/%50/%84 · P(MMI ≥ VII), P(MMI ≥ VIII) haritaları |
 | 🤖 **ML katkısı** | Monoton kısıtlı LightGBM artık modeli: katman dışı RMSE **0,68 → 0,45** (istasyon bazlı CV'de 0,49) |
-| 🧱 **Zemin** | Vs30'un artıklara ek katkısı neredeyse sıfır (|SHAP| ≈ 0,001); Allen vd. (2012) bulgusuyla uyumlu |
-| 👥 **Maruziyet** | Kahramanmaraş Mw 7.8 senaryosunda medyan tahminle **2,3 milyon** kişi (≥ 15 000 nüfuslu yerleşimlerde) MMI ≥ VII |
+| 🧱 **Zemin** | Her noktaya USGS Vs30 rasteri. ML artık modelinde Vs30'un ek katkısı neredeyse sıfır (|SHAP| ≈ 0,001); Allen vd. (2012) bulgusuyla uyumlu |
+| 👥 **Maruziyet** | Kahramanmaraş Mw 7.8 senaryosunda medyan tahminle **5,3 milyon** kişi (≥ 15 000 nüfuslu yerleşimlerde) MMI ≥ VII |
 
 ## Neden yeniden yazıldı?
 
@@ -84,12 +84,12 @@ Katsayılar hafızadan yazılmadı. Testler Allen 2012 sonuçlarını OpenQuake 
 ### Kaynak geometrisi
 
 - **Mw < 6.5:** nokta kaynak (Rjb ≈ Repi, Rrup ≈ Rhyp).
-- **Mw ≥ 6.5:** sonlu fay. USGS FFM ya da ShakeMap `rupture.json` verilirse doğrudan kullanılır. Verilmezse episantr çevresindeki GEM Global Active Faults izleri uç uca zincirlenir ve episantrın izdüşümü etrafında Thingbaijam vd. (2017) ölçek yasasıyla L uzunluğunda (Mw 7.8 doğrultu atımlı için 234 km), W genişliğinde bir parça kesilir.
+- **Mw ≥ 6.5:** sonlu fay. ShakeMap `rupture.json` ya da USGS FFM verilirse kullanılır; ancak uzunluğu Thingbaijam (2017) medyanının yarısından kısaysa reddedilir (bazı eski ShakeMap Atlas faylarında Mw 7.6 İzmit için yalnızca 15 km'lik tek parça vardır). Verilmezse episantr çevresindeki GEM Global Active Faults izleri uç uca zincirlenir ve episantrın izdüşümü etrafında Thingbaijam vd. (2017) ölçek yasasıyla L uzunluğunda (Mw 7.8 doğrultu atımlı için 234 km), W genişliğinde bir parça kesilir.
 - Rjb, fay izdüşümüne olan uzaklıktır ve `shapely` ile hesaplanır. Rrup düşey faylarda `shapely` ile, eğimli faylarda 1 km aralıklı yüzey ağıyla hesaplanır.
 
 ### Zemin
 
-Her noktaya USGS Global Vs30 Mosaic rasterinden `rasterio` ile Vs30 atanır (`scripts/download_data.py vs30`). Raster yoksa 760 m/s referans değeri kullanılır ve kullanıcı uyarılır. Doğrulamada istasyonların kendi Vs30 değerleri kullanıldı.
+Her noktaya USGS Global Vs30 Mosaic'ten `rasterio` ile Vs30 atanır. Türkiye ve çevresi için kırpılmış raster repoda hazırdır (`data/vs30/vs30_turkey.tif`, 24–46°D, 33–43,5°K, 30 yay saniyesi). Küresel ızgara için `scripts/download_data.py vs30` kullanılabilir. Raster dışındaki noktalarda 760 m/s referans değeri atanır ve kullanıcı uyarılır. Doğrulamada da tüm gözlem noktalarına aynı rasterden Vs30 atandı. ShakeMap istasyon listesindeki AFAD istasyonlarının ~%48'inde görülen 760 m/s değeri bir yer tutucudur: raster bu istasyonlar için 270–643 m/s (medyan 429) verir.
 
 ### Belirsizlik ve mantık ağacı
 
@@ -106,54 +106,67 @@ Gerekçeler: [`docs/logic_tree.md`](docs/logic_tree.md).
 
 ## Doğrulama sonuçları
 
-Artık = gözlem − tahmin; **negatif sapma, modelin fazla tahmin ettiğini** gösterir. Enstrümantal gözlemlerde PGV, Worden vd. (2012) ile MMI'ya çevrildi. Tüm tablolar ve grafikler: [`results/`](results/README.md).
+Artık = gözlem − tahmin; **negatif sapma, modelin fazla tahmin ettiğini** gösterir. Enstrümantal gözlemlerde PGV, Worden vd. (2012) ile MMI'ya çevrildi. Vs30 tüm noktalarda USGS rasterinden alındı. Tüm tablolar ve grafikler: [`results/`](results/README.md).
 
-### Kahramanmaraş 2023 (Mw 7.8 Pazarcık + Mw 7.5 Elbistan)
+### Altı büyük deprem (1 324 gözlem)
 
-Gözlemler: **248 USGS DYFI** hücresi (≥ 3 yanıt, şüpheliler hariç), ShakeMap istasyon listesindeki **296 AFAD** istasyonu ve **8 KOERI** kaydı. Fay geometrisi: USGS ShakeMap `rupture.json` (Pazarcık 286 km, Elbistan 136 km).
+Gözlemler USGS ComCat'ten alındı: **DYFI** (≥ 3 yanıt), ShakeMap istasyon listesindeki **AFAD, KOERI ve diğer ağların** PGV'leri ve ShakeMap'teki **makrosismik saha şiddetleri** (1999 depremleri, Sisam 2020 için EMSC). Fay sırasıyla ShakeMap → FFM → otomatik GEM olarak seçildi (`data/events.csv`).
 
-| Model | Tümü (552) | DYFI (248) | AFAD (296) |
+| Deprem | Mw | Fay | N | Eski formül | Allen 2012 Rrup | Bayrak 2019 | Kale → WGRW12 | Mantık ağacı |
+|---|---|---|---|---|---|---|---|---|
+| Kahramanmaraş (Pazarcık) 2023 | 7.8 | ShakeMap, 286 km | 447 | 2,09 | 0,86 | 1,05 | 0,98 | **0,85** |
+| Kahramanmaraş (Elbistan) 2023 | 7.5 | ShakeMap, 136 km | 136 | 1,99 | 0,95 | **0,87** | 1,16 | 0,99 |
+| Elazığ (Sivrice) 2020 | 6.7 | ShakeMap, 37 km | 39 | 1,53 | 0,79 | **0,77** | 0,82 | 0,92 |
+| Sisam / İzmir 2020 | 7.0 | FFM, 40 km | 491 | 2,64 | 0,95 | 1,39 | 0,93 | **0,87** |
+| Düzce 1999 | 7.2 | GEM otomatik, 91 km | 86 | 2,06 | 1,18 | 1,21 | **1,11** | 1,21 |
+| Kocaeli (İzmit) 1999 | 7.6 | FFM, 175 km | 125 | 2,08 | 1,11 | 1,40 | **1,05** | 1,12 |
+| **Toplam (sapma · RMSE)** | | | 1 324 | −2,01 · 2,29 | −0,17 · 0,95 | −0,48 · 1,21 | +0,01 · 0,99 | **−0,11 · 0,93** |
+
+<sub>Deprem satırlarında RMSE (MMI). Gözlem türüne göre ayrıntı: `results/metrics_six_events_by_obs_type.csv`.</sub>
+
+<p align="center"><img src="results/residual_distance_six_events.png" width="100%"></p>
+
+**Kaynak geometrisi ne kadar önemli?** Aynı gözlemler, üç geometriyle (mantık ağacı ortalaması, RMSE):
+
+| Geometri | Kahramanmaraş, tümü (583) | Kahramanmaraş, faya ≤ 50 km (65) | Altı deprem, faya ≤ 50 km (210) |
 |---|---|---|---|
-| Eski formül (doğrulanmamış) | −1,75 · 2,05 | −2,14 · 2,40 | −1,42 · 1,71 |
-| Allen 2012 · Rhyp | −0,06 · 1,05 | | |
-| **Allen 2012 · Rrup** | **+0,10 · 0,89** | −0,31 · 0,96 | **+0,44 · 0,82** |
-| Bayrak 2019 · R3 | +0,12 · 1,02 | −0,30 · 1,03 | +0,46 · 1,02 |
-| Kale 2015 → WGRW12 | +0,48 · 1,04 | +0,01 · 0,95 | +0,87 · 1,11 |
-| Kale 2015 → Bilal & Askan 2014 | +0,46 · 1,07 | | |
-| **Mantık ağacı (ortalama)** | +0,32 · 0,90 | **−0,05 · 0,85** | +0,63 · 0,93 |
+| Nokta kaynak | 1,18 | 2,26 | 1,59 |
+| GEM izi + Thingbaijam 2017 (**otomatik**, dış veri gerektirmez) | 0,92 | 1,10 | 1,24 |
+| USGS fayı (ShakeMap / FFM) | 0,88 | 1,07 | 1,17 |
 
-<sub>Hücreler: sapma · RMSE (MMI). Ayrıntı: `results/metrics_kahramanmaras*.csv`.</sub>
+### Kahramanmaraş 2023: gözlem türüne göre
 
-<p align="center"><img src="results/residual_distance_kahramanmaras.png" width="100%"></p>
+| Model | DYFI (248) | AFAD (296) | KOERI (34) |
+|---|---|---|---|
+| Eski formül (doğrulanmamış) | −2,14 · 2,40 | −1,42 · 1,71 | −2,15 · 2,31 |
+| Allen 2012 · Rrup | −0,31 · 0,96 | +0,44 · **0,82** | −0,09 · 0,81 |
+| Bayrak 2019 · R3 | −0,30 · 1,03 | +0,46 · 1,02 | −0,22 · **0,76** |
+| Kale 2015 → WGRW12 | −0,19 · 1,06 | +0,73 · 1,00 | +0,22 · 0,94 |
+| Mantık ağacı (ortalama) | −0,25 · **0,95** | +0,49 · 0,83 | +0,09 · 0,82 |
 
-**Kaynak geometrisi ne kadar önemli?** Aynı 552 gözlem, üç kaynak geometrisiyle (mantık ağacı ortalaması):
+<sub>Hücreler: sapma · RMSE (MMI). Tüm gözlemlerde (583): eski formül −1,77 · 2,07; Allen 2012 Rrup +0,08 · 0,88; mantık ağacı +0,15 · 0,88.</sub>
 
-| Geometri | RMSE (tümü) | RMSE (USGS fayına Rjb ≤ 50 km, 64 nokta) |
-|---|---|---|
-| Nokta kaynak | 1,22 | 2,26 |
-| GEM izi + Thingbaijam 2017 (**otomatik**, dış veri gerektirmez) | 0,93 | 1,09 |
-| USGS ShakeMap fayı | 0,90 | 1,05 |
-
-### Türkiye geneli (KOERI kuvvetli yer hareketi)
+### Türkiye geneli (KOERI kuvvetli yer hareketi tablosu)
 
 | Model | Mw ≥ 6 (18 deprem, 54 kayıt) | Tüm KOERI (332 deprem, 949 kayıt) |
 |---|---|---|
 | Eski formül (doğrulanmamış) | −2,36 · 2,45 | −2,64 · 2,69 |
 | Allen 2012 · Rhyp | −0,61 · 0,89 | −0,59 · 0,77 |
-| Allen 2012 · Rrup | −0,56 · 0,89 | −1,22 · 1,32 |
+| Allen 2012 · Rrup | −0,57 · 0,89 | −1,22 · 1,32 |
 | Bayrak 2019 · R3 | −1,63 · 1,91 | −2,52 · 2,60 ¹ |
-| **Kale 2015 → WGRW12** | **−0,17 · 0,69** | **−0,41 · 0,68** |
-| Kale 2015 → Bilal & Askan 2014 | +0,20 · 0,95 | +0,73 · 1,06 |
-| Mantık ağacı (ortalama) | −0,48 · 0,81 | −0,84 · 0,98 |
+| **Kale 2015 → WGRW12** | **−0,17 · 0,69** | **−0,42 · 0,68** |
+| Kale 2015 → Bilal & Askan 2014 | +0,20 · 0,96 | +0,73 · 1,06 |
+| Mantık ağacı (ortalama) | −0,48 · 0,80 | −0,85 · 0,98 |
 
 <sub>¹ Bayrak 2019, MMI ≥ 4 ve Mw ≥ 4.5 için türetildi; tüm-KOERI kümesinin büyük kısmı bu aralığın dışında.</sub>
 
 **Bulgular**
 
-1. **Eski formül uzaklıkla çok yavaş azalıyor.** Kahramanmaraş'ta fayın 25 km yakınında sapması küçük (−0,16). Ama 100–200 km'de −1,65'e, 400 km ötesinde −2,38'e çıkıyor. Literatür taramasındaki "uzak mesafede 1,5–2 MMI fazla" tespiti gerçek gözlemlerle doğrulandı.
-2. **Büyük depremde sonlu fay belirleyici.** Nokta kaynakla fay yakınındaki RMSE 2,26 iken, fay geometrisiyle 1,05–1,09'a iniyor. GEM izlerinden otomatik kurulan fay, USGS'in deprem sonrası yayımladığı faya neredeyse eşdeğer. Bu, USGS ürünü yayımlanmadan önce de hızlı ve doğru harita üretilebileceğini gösteriyor.
-3. **Model seçimi gözlem türüne bağlı.** Kahramanmaraş'ta Allen 2012 en dengeli model. Kale zinciri DYFI'yi iyi yakalıyor (sapma +0,01), ama AFAD istasyonlarını 0,9 MMI düşük tahmin ediyor. Bunun bir kısmı bileşen farkından (AFAD büyük bileşen, Kale geometrik ortalama), bir kısmı da Mw 7.8'deki yakın alan doygunluğundan geliyor. Daha küçük Türkiye depremlerinde (Mw ≥ 6) ise en iyi model Kale zinciri. Mantık ağacı her iki durumda da en iyiye yakın kalıyor.
-4. **Enstrümantal "gözlem" de bir modele bağlı.** Aynı PGV'ler Bilal & Askan ile MMI'ya çevrildiğinde Kahramanmaraş RMSE'leri 0,7–0,8 MMI artıyor (`results/sensitivity_observed_gmice.csv`). DYFI bu döngüselliği kırıyor: DYFI'ye karşı da eski formül açık ara en kötü (RMSE 2,40), mantık ağacı en iyi (0,85).
+1. **Eski formül altı depremin hepsinde açık ara en kötü model.** Ortalama 2 MMI fazla tahmin ediyor. Kahramanmaraş'ta fayın 25 km yakınında sapması küçük, ama 100–200 km'de −1,6'ya, 400 km ötesinde −2,4'e çıkıyor (`results/metrics_kahramanmaras_by_distance.csv`). Literatür taramasındaki "uzak mesafede 1,5–2 MMI fazla" tespiti gerçek gözlemlerle doğrulandı.
+2. **Büyük depremde sonlu fay belirleyici.** Kahramanmaraş'ta fay yakınındaki RMSE nokta kaynakla 2,26'dan sonlu fayla 1,07–1,10'a iniyor. GEM izlerinden otomatik kurulan fay, USGS'in deprem sonrası yayımladığı faya neredeyse eşdeğer. Yani USGS ürünü yayımlanmadan önce de doğru bir harita üretilebilir. Düzce 1999'da USGS'in kullanılabilir bir fayı olmadığı için bu yol zorunluydu.
+3. **Tek bir "en iyi" model yok; mantık ağacı en istikrarlı seçenek.** Deprem bazında en iyi model değişiyor: Allen, Bayrak ya da Kale zinciri. Mantık ağacı her depremde en iyi modelden en fazla 0,15 MMI uzakta kalıyor ve toplamda en düşük RMSE'yi veriyor. Bu, ağırlıklı birleştirmeyi destekleyen ampirik bir bulgu.
+4. **Bayrak 2019 orta büyüklükte iyi, en büyük depremlerde zayıf.** Elazığ ve Elbistan'da en iyi model; ancak Sisam ve İzmit'te RMSE 1,4. Bu, episantral uzaklığın uzun ya da açık denizdeki faylarda yetersiz kalmasıyla uyumlu.
+5. **Enstrümantal "gözlem" de bir modele bağlı.** Aynı PGV'ler Bilal & Askan ile MMI'ya çevrildiğinde RMSE 0,5–0,8 MMI artıyor (`results/sensitivity_observed_gmice.csv`). DYFI ve saha şiddetleri bu döngüselliği kırıyor; onlara karşı da sıralama değişmiyor (eski formül en kötü, mantık ağacı en iyiler arasında).
 
 ## Makine öğrenmesi: artık modeli
 
@@ -163,7 +176,7 @@ Literatürün önerdiği hibrit yapı uygulandı: `MMI = MMI_fizik + f_LightGBM(
 |---|---|---|---|
 | Tümü (deprem bazlı CV) | 0,68 | 0,54 | **0,45** |
 | Tümü (istasyon bazlı CV) | 0,68 | 0,55 | **0,49** |
-| Mw ≥ 6 | 0,69 | 0,72 | **0,66** |
+| Mw ≥ 6 | 0,69 | 0,71 | **0,65** |
 | Rrup ≤ 50 km | 0,59 | 0,70 | **0,53** |
 
 <sub>Katman dışı RMSE (MMI). Ayrıntı: [`results/ml/`](results/ml/README.md).</sub>
@@ -175,15 +188,17 @@ Literatürün önerdiği hibrit yapı uygulandı: `MMI = MMI_fizik + f_LightGBM(
 
 ## Nüfus maruziyeti
 
-USGS PAGER mantığıyla, tahmin edilen MMI sınıflarına göre nüfus toplanır. Kahramanmaraş Mw 7.8 senaryosu (sonlu fay, Vs30 = 760 m/s, episantrın ±3° çevresi, Suriye dahil):
+USGS PAGER mantığıyla, tahmin edilen MMI sınıflarına göre nüfus toplanır. Kahramanmaraş Mw 7.8 senaryosu (otomatik GEM fayı, USGS Vs30, episantrın ±3° çevresi, Suriye dahil):
 
 | MMI | %16 | Medyan | %84 |
 |---|---|---|---|
-| V | 9 679 190 | 11 397 279 | 3 660 996 |
-| VI | 1 352 247 | 9 482 003 | 10 039 265 |
-| VII | 534 663 | 1 730 637 | 7 147 940 |
-| VIII | 0 | 570 603 | 3 755 596 |
-| IX | 0 | 0 | 879 707 |
+| IV | 9 643 450 | 489 383 | 0 |
+| V | 10 518 798 | 9 179 461 | 1 034 302 |
+| VI | 4 092 977 | 10 518 798 | 8 673 608 |
+| VII | 1 202 885 | 4 005 583 | 9 597 135 |
+| VIII | 0 | 1 290 279 | 4 831 667 |
+| IX | 0 | 0 | 1 217 195 |
+| X+ | 0 | 0 | 129 597 |
 
 <sub>Nüfus: GeoNames ≥ 15 000 nüfuslu yerleşimler (kırsal nüfus hariç, bu yüzden PAGER değerlerinden düşüktür). GHSL ya da TÜİK rasteri `exposure(..., raster=...)` ile kullanılabilir. Tam tablo: `results/kahramanmaras_exposure.csv`.</sub>
 
@@ -221,13 +236,13 @@ pytest -q                                       # 25 test
 
 ```bash
 python scripts/download_data.py usgs us6000jllz          # DYFI, ShakeMap istasyonları, rupture.json, FFM
-python scripts/build_usgs_observations.py us6000jllz      # → data/observations/usgs_observations.csv
-python scripts/download_data.py vs30 --url <GeoTIFF>     # USGS Global Vs30 Mosaic
+python scripts/build_usgs_observations.py                # → data/events.csv, data/observations/usgs_observations.csv, data/ruptures/
+python scripts/download_data.py vs30                     # USGS Global Vs30 Mosaic, küresel (~610 MB)
 # AFAD TADAS tablosu → data/raw/us6000jllz/afad_stations.csv (station, lat, lon, pgv_cms)
 # Saha haritası     → data/raw/us6000jllz/field_map.csv     (lat, lon, mmi)
 ```
 
-Kahramanmaraş için USGS gözlemleri ve ShakeMap fayları repoda hazır (`data/observations/usgs_observations.csv`, `data/ruptures/`); benchmark ek indirme gerektirmez.
+Altı depremin USGS gözlemleri, fayları ve Türkiye Vs30 rasteri repoda hazır; benchmark ek indirme gerektirmez.
 
 ## Klasör yapısı
 
@@ -248,8 +263,10 @@ Kahramanmaraş için USGS gözlemleri ve ShakeMap fayları repoda hazır (`data/
 ├── notebooks/kahramanmaras_demo.ipynb
 ├── scripts/                        # benchmark, ML, görseller, veri indirme
 ├── data/faults/                    # GEM aktif fay izleri (CC BY-SA 4.0)
-├── data/observations/              # KOERI kayıtları, USGS DYFI + AFAD (ShakeMap) gözlemleri
-├── data/ruptures/                  # USGS ShakeMap fay geometrileri
+├── data/events.csv                 # Benchmark depremleri ve seçilen fay geometrisi
+├── data/observations/              # KOERI kayıtları; altı depremin USGS DYFI, istasyon ve saha gözlemleri
+├── data/ruptures/                  # USGS ShakeMap / FFM fay geometrileri
+├── data/vs30/                      # USGS Vs30, Türkiye kırpımı
 ├── results/                        # Benchmark ve ML çıktıları
 ├── docs/                           # Literatür taraması, mantık ağacı
 ├── tests/                          # pytest (OpenQuake karşılaştırmaları dahil)
@@ -262,8 +279,8 @@ Kahramanmaraş için USGS gözlemleri ve ShakeMap fayları repoda hazır (`data/
 |---|---|---|
 | Aktif fay izleri | GEM Global Active Faults (Styron & Pagani 2020) | CC BY-SA 4.0 |
 | Kuvvetli yer hareketi | KOERI / ORFEUS-EIDA, [turkiye-deprem-verisi](https://github.com/Ayberkrk/turkiye-deprem-verisi) üzerinden | Yalnızca akademik / ticari olmayan kullanım |
-| DYFI, ShakeMap istasyonları (AFAD) ve fay | USGS ComCat (us6000jllz, us6000jlqa) | Kamu malı |
-| İstasyon Vs30 | USGS Global Vs30 Mosaic | Kamu malı |
+| DYFI, ShakeMap istasyonları (AFAD, KOERI vd.), saha şiddetleri ve faylar | USGS ComCat (altı deprem, `data/events.csv`) | Kamu malı |
+| Vs30 rasteri | USGS Global Vs30 Mosaic (Türkiye kırpımı) | Kamu malı |
 | Yerleşim nüfusu | GeoNames (`geonamescache`) | CC BY 4.0 |
 
 Ayrıntılar: [`data/faults/README.md`](data/faults/README.md), [`data/observations/README.md`](data/observations/README.md).
@@ -271,12 +288,12 @@ Ayrıntılar: [`data/faults/README.md`](data/faults/README.md), [`data/observati
 ## Sınırlılıklar ve sonraki adımlar
 
 - **Saha haritası ve TADAS henüz yok.** Albayrak vd. (2024) saha şiddetleri ve TADAS'ın tam istasyon tablosu eklenmedi. `data/raw/<event_id>/` altına konduklarında benchmark onları otomatik olarak kullanır.
-- **Vs30 rasteri** (`apps.usgs.gov`) bu geliştirme ortamından indirilemedi. Harita senaryolarında 760 m/s kullanılıyor. Doğrulamada istasyon ve DYFI noktalarına ShakeMap'in atadığı Vs30 değerleri kullanıldı. ShakeMap listesindeki AFAD istasyonlarının yaklaşık yarısında bu değer 760 m/s.
-- **AFAD PGV bileşeni:** ShakeMap listesindeki PGV büyük yatay bileşendir, Kale 2015 ise geometrik ortalama verir.
+- **Makrosismik veriler karışık ölçekli olabilir.** ShakeMap'teki saha şiddetleri (1999 depremleri, Sisam 2020 için EMSC) olduğu gibi MMI kabul edildi; ölçek dönüşümü uygulanmadı.
+- **İstasyon PGV bileşeni:** ShakeMap listesindeki PGV büyük yatay bileşendir, Kale 2015 ise geometrik ortalama verir. Bu, Kale zincirinin istasyonlara karşı pozitif sapmasının (~0,1–0,3 MMI) bir kısmını açıklar.
 - **KOERI veri seti:** kaynak belgesine göre PGA'lar Akkar vd. (2014)'e göre log10'da ~0,24 düşük. Tüm-KOERI kümesindeki negatif sapmanın bir kısmı buradan gelebilir.
 - **Kabul edilen varsayımlar:** Bayrak 2019'da log tabanı (log10) ve σY'nin toplam sigma olduğu; Bilal & Askan 2014 için σ_GMICE = 0,63 (WGRW12'den vekil); GEM izlerinde sağ el eğim kuralı; GMPE geometrik ortalama bileşeni ile GMICE bileşeni arasında dönüşüm yapılmaması.
-- **Yakın alan:** Fay üzerindeki yerleşimlerde medyan tahmin VIII civarında kalıyor. Fayın 13 km yakınındaki KHMN istasyonunda gözlem 9,2, mantık ağacı medyanı 8,2. Yönelim (directivity) ve havza etkileri modelde yok.
-- **Sonraki adımlar:** DYFI ve AFAD ile benchmark'ı genişletmek; kalan artıklar için uzamsal Gauss süreci; Elazığ 2020 ve Düzce 1999'u benchmark setine eklemek; Türkiye için Rrup tabanlı bir IPE kalibre etmek (literatür boşluğu #2).
+- **Yakın alan:** Kahramanmaraş'ta faya 10 km içindeki 15 istasyonda gözlenen ortalama 9,0, mantık ağacı medyanı 8,3. Yönelim (directivity) ve havza etkileri modelde yok.
+- **Sonraki adımlar:** ML artık modelini altı depremin DYFI ve saha verisiyle genişletmek; kalan artıklar için uzamsal Gauss süreci; bu 1 324 gözlemle Türkiye için Rrup tabanlı bir IPE kalibre etmek (literatür boşluğu #2) ve gözlemleri açık bir Türkiye şiddet veri seti olarak yayımlamak (boşluk #1).
 
 ## Kaynaklar
 

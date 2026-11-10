@@ -1,0 +1,7 @@
+event_id,name,mag,mag_type,lat,lon,depth_km,time_ms,rupture,rupture_length_km,rupture_file
+us6000jllz,Kahramanmaraş (Pazarcık) 2023,7.8,mww,37.2256,37.0143,10.0,1675646254342,shakemap,285.5,data/ruptures/us6000jllz_shakemap.geojson
+us6000jlqa,Kahramanmaraş (Elbistan) 2023,7.5,mww,38.0106,37.1962,7.432,1675679088811,shakemap,135.9,data/ruptures/us6000jlqa_shakemap.geojson
+us60007ewc,Elazığ (Sivrice) 2020,6.7,mww,38.4312,39.0609,10.0,1579888514147,shakemap,37.5,data/ruptures/us60007ewc_shakemap.geojson
+us7000c7y0,Sisam / İzmir 2020,7.0,mww,37.8973,26.7838,21.0,1604058687348,ffm,40.1,data/ruptures/us7000c7y0_ffm.geojson
+usp0009hev,Düzce 1999,7.2,mwc,40.758,31.161,10.0,942425839550,gem,91.2,
+usp0009d4z,Kocaeli (İzmit) 1999,7.6,mwc,40.748,29.864,17.0,934848099130,ffm,175.5,data/ruptures/usp0009d4z_ffm.geojson

@@ -22,13 +22,23 @@ modeline kıyasla log10'da ~0,24 düşüktür (nedeni ayrıştırılmamış).
 
 ## `usgs_observations.csv`
 
-Kahramanmaraş 2023 depremleri (us6000jllz Mw 7.8, us6000jlqa Mw 7.5) için USGS ComCat ürünlerinden
-türetilmiş gözlemler. Üretmek için:
-`python scripts/download_data.py usgs <event_id>` ve `python scripts/build_usgs_observations.py`.
+Altı büyük deprem için USGS ComCat ürünlerinden türetilmiş 1 324 gözlem (olay listesi: `data/events.csv`):
+Kahramanmaraş (Pazarcık) 2023 `us6000jllz`, Kahramanmaraş (Elbistan) 2023 `us6000jlqa`, Elazığ 2020 `us60007ewc`,
+Sisam/İzmir 2020 `us7000c7y0`, Düzce 1999 `usp0009hev`, Kocaeli (İzmit) 1999 `usp0009d4z`.
+Üretmek için: `python scripts/download_data.py usgs <event_id>` ve `python scripts/build_usgs_observations.py`.
 
-- **USGS DYFI** (`cdi_geo.txt`): ≥ 3 yanıtlı, şüpheli işaretli olmayan hücreler (us6000jllz 186, us6000jlqa 62).
-- **AFAD** (ShakeMap `stationlist.json`, ağ kodu TK): ShakeMap'in aykırı işaretlemediği istasyonların PGV'si
-  (büyük yatay bileşen, cm/s) (us6000jllz 241, us6000jlqa 55).
-- **Vs30:** istasyonlarda ShakeMap'in atadığı değer; DYFI hücrelerinde ShakeMap listesindeki en yakın noktanın
-  (≤ 7 km) değeri (`vs30_source` sütunu).
-- Lisans: USGS verileri kamu malıdır. AFAD istasyon verisi USGS ShakeMap üzerinden alınmıştır; AFAD'a atıf yapın.
+- **USGS DYFI** (`cdi_geo.txt`): ≥ 3 yanıtlı, şüpheli işaretli olmayan hücreler.
+- **İstasyonlar** (ShakeMap `stationlist.json`, `station_type = seismic`): ShakeMap'in aykırı işaretlemediği
+  istasyonların PGV'si (büyük yatay bileşen, cm/s). Ağ kodu TK → AFAD, KO → KOERI, diğerleri (Yunan ağları,
+  1999 ağları) → "istasyon (ShakeMap)".
+- **Makrosismik** (ShakeMap listesinde ağ kodu `INTENSITY`): 1999 depremlerinin gözlenen saha şiddetleri ve
+  Sisam 2020 için EMSC şiddetleri. Ölçek dönüşümü uygulanmamıştır.
+- **Vs30:** tüm noktalarda USGS Global Vs30 rasteri (`data/vs30/vs30_turkey.tif`, dışında küresel ızgara).
+  ShakeMap listesindeki değer `vs30_shakemap` sütunundadır; AFAD istasyonlarının ~%48'inde bu değer 760 m/s
+  yer tutucusudur.
+- Lisans: USGS verileri kamu malıdır. İstasyon verisi AFAD, KOERI ve ilgili ağlara aittir; atıf yapın.
+
+## `../vs30/vs30_turkey.tif`
+
+USGS Global Vs30 Mosaic'in (Heath vd. 2020; `global_vs30.grd`, 30 yay saniyesi) 24–46°D, 33–43,5°K kırpımı.
+Kaynak: https://earthquake.usgs.gov/data/vs30/ — kamu malı.

@@ -53,7 +53,7 @@ def main():
     cmap = ListedColormap(MMI_COLORS)
     norm = BoundaryNorm(np.arange(0.5, 11.0, 1.0), cmap.N)
     panels = [("legacy", "Eski formül (doğrulanmamış, nokta kaynak)", cmap, norm),
-              ("lt_p50", "Mantık ağacı medyanı (sonlu fay, Vs30 = 760 m/s)", cmap, norm),
+              ("lt_p50", "Mantık ağacı medyanı (sonlu fay + USGS Vs30)", cmap, norm),
               ("p_ge_8", "P(MMI ≥ VIII)", plt.get_cmap("magma_r"), None)]
     fig, axes = plt.subplots(1, 3, figsize=(16, 4.8), constrained_layout=True)
     top = places.nlargest(8, "population")
@@ -68,6 +68,8 @@ def main():
         for _, r in top.iterrows():
             ax.plot(r.lon, r.lat, "o", ms=3, color="k")
             ax.annotate(r["name"], (r.lon, r.lat), fontsize=7, xytext=(3, 3), textcoords="offset points")
+        ax.set_xlim(LON.min(), LON.max())
+        ax.set_ylim(LAT.min(), LAT.max())
         ax.set_title(title, fontsize=10)
         ax.set_aspect(1 / np.cos(np.radians(ev.lat)))
         ax.set_xlabel("Boylam")

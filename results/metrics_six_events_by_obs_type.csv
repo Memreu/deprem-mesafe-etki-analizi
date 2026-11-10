@@ -1,0 +1,22 @@
+grup,model,N,sapma,RMSE,MAE,std
+DYFI,Eski formül (doğrulanmamış),327,-2.176,2.422,2.234,1.064
+DYFI,Allen 2012 · Rhyp,327,-0.515,1.120,0.927,0.996
+DYFI,Allen 2012 · Rrup,327,-0.330,0.957,0.782,0.900
+DYFI,Bayrak 2019 · R3,327,-0.492,1.134,0.909,1.023
+DYFI,Kale 2015 → WGRW12,327,-0.209,1.042,0.851,1.022
+DYFI,Kale 2015 → Bilal & Askan 2014,327,-0.190,1.008,0.802,0.991
+DYFI,Mantık ağacı (ortalama),327,-0.264,0.943,0.767,0.907
+enstrümantal,Eski formül (doğrulanmamış),550,-1.747,2.001,1.815,0.978
+enstrümantal,Allen 2012 · Rhyp,550,-0.006,0.934,0.742,0.935
+enstrümantal,Allen 2012 · Rrup,550,0.097,0.850,0.676,0.845
+enstrümantal,Bayrak 2019 · R3,550,-0.081,1.062,0.858,1.060
+enstrümantal,Kale 2015 → WGRW12,550,0.338,0.921,0.720,0.858
+enstrümantal,Kale 2015 → Bilal & Askan 2014,550,0.119,1.103,0.840,1.097
+enstrümantal,Mantık ağacı (ortalama),550,0.177,0.863,0.677,0.846
+makrosismik,Eski formül (doğrulanmamış),447,-2.211,2.502,2.250,1.172
+makrosismik,Allen 2012 · Rhyp,447,-0.452,1.142,0.976,1.050
+makrosismik,Allen 2012 · Rrup,447,-0.368,1.053,0.901,0.988
+makrosismik,Bayrak 2019 · R3,447,-0.965,1.421,1.214,1.045
+makrosismik,Kale 2015 → WGRW12,447,-0.242,1.035,0.871,1.007
+makrosismik,Kale 2015 → Bilal & Askan 2014,447,-0.336,1.060,0.823,1.006
+makrosismik,Mantık ağacı (ortalama),447,-0.351,0.995,0.831,0.932

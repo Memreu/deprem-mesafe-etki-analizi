@@ -3,7 +3,7 @@
 Kullanım
 --------
     python scripts/download_data.py usgs us6000jllz          # DYFI, ShakeMap istasyonları, rupture.json, FFM
-    python scripts/download_data.py vs30 --url <GeoTIFF URL> # USGS Global Vs30 Mosaic
+    python scripts/download_data.py vs30                     # USGS Global Vs30 Mosaic (~610 MB)
 
 USGS ürün dosya adları sürümden sürüme değişebildiği için, ComCat olay detayındaki
 ürün içeriği (contents) son ekine göre aranır. Dosyalar ``data/raw/<event_id>/`` altına yazılır.
@@ -22,6 +22,7 @@ import urllib.request
 from pathlib import Path
 
 RAW = Path(__file__).resolve().parent.parent / "data" / "raw"
+VS30_URL = "https://apps.usgs.gov/shakemap_geodata/vs30/global_vs30.grd"  # https://earthquake.usgs.gov/data/vs30/
 COMCAT = "https://earthquake.usgs.gov/fdsnws/event/1/query?eventid={eid}&format=geojson"
 WANTED = {
     "dyfi": ["cdi_geo_1km.txt", "cdi_geo.txt", "cdi_zip.txt"],
@@ -60,7 +61,7 @@ def download_usgs(event_id: str) -> list[Path]:
 
 def download_vs30(url: str) -> Path:
     RAW.mkdir(parents=True, exist_ok=True)
-    target = RAW / "global_vs30.tif"
+    target = RAW / Path(url).name
     print(f"İndiriliyor: {url}")
     urllib.request.urlretrieve(url, target)  # noqa: S310
     return target
@@ -72,8 +73,8 @@ def main(argv=None):
     u = sub.add_parser("usgs")
     u.add_argument("event_id")
     v = sub.add_parser("vs30")
-    v.add_argument("--url", required=True,
-                   help="USGS Global Vs30 Mosaic GeoTIFF bağlantısı (https://earthquake.usgs.gov/data/vs30/)")
+    v.add_argument("--url", default=VS30_URL,
+                   help="USGS Global Vs30 Mosaic ızgarası (varsayılan: %(default)s, ~610 MB)")
     a = p.parse_args(argv)
     try:
         if a.cmd == "usgs":

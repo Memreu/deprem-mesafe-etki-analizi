@@ -37,7 +37,8 @@ with st.sidebar:
     lon = st.number_input("Episantr boylamı", 25.0, 46.0, lo0, 0.01, format="%.4f")
     depth = st.number_input("Derinlik (km)", 1.0, 100.0, d0, 1.0)
     finite = st.checkbox("Sonlu fay (GEM izi + Thingbaijam 2017)", value=mag >= 6.5)
-    vs30 = st.number_input("Vs30 (m/s) — raster yoksa tüm noktalara", 150.0, 1500.0, 760.0, 10.0)
+    use_raster = st.checkbox("Vs30: USGS Global Vs30 rasteri", value=True)
+    vs30 = None if use_raster else st.number_input("Sabit Vs30 (m/s)", 150.0, 1500.0, 760.0, 10.0)
     st.header("Mantık ağacı ağırlıkları")
     w = {k: st.slider(MODEL_LABELS[k], 0.0, 1.0, v, 0.05) for k, v in LogicTree().weights.items()}
     st.header("Harita")

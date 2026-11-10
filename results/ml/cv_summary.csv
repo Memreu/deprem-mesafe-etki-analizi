@@ -1,13 +1,13 @@
 küme,yöntem,N,deprem,sapma,RMSE
-tümü,omurga (Kale 2015 → WGRW12),949,332,-0.415,0.683
+tümü,omurga (Kale 2015 → WGRW12),949,332,-0.416,0.682
 tümü,omurga + sabit kaydırma,949,332,0.000,0.542
-tümü,omurga + LightGBM,949,332,0.001,0.447
-Mw ≥ 6,omurga (Kale 2015 → WGRW12),54,18,-0.167,0.695
-Mw ≥ 6,omurga + sabit kaydırma,54,18,0.247,0.722
-Mw ≥ 6,omurga + LightGBM,54,18,-0.004,0.662
-Rrup ≤ 50 km,omurga (Kale 2015 → WGRW12),138,87,-0.038,0.590
-Rrup ≤ 50 km,omurga + sabit kaydırma,138,87,0.378,0.701
-Rrup ≤ 50 km,omurga + LightGBM,138,87,-0.026,0.530
-tümü · istasyon bazlı CV,omurga (Kale 2015 → WGRW12),949,332,-0.415,0.683
-tümü · istasyon bazlı CV,omurga + sabit kaydırma,949,332,0.000,0.548
-tümü · istasyon bazlı CV,omurga + LightGBM,949,332,-0.033,0.489
+tümü,omurga + LightGBM,949,332,0.001,0.445
+Mw ≥ 6,omurga (Kale 2015 → WGRW12),54,18,-0.170,0.690
+Mw ≥ 6,omurga + sabit kaydırma,54,18,0.244,0.714
+Mw ≥ 6,omurga + LightGBM,54,18,-0.006,0.652
+Rrup ≤ 50 km,omurga (Kale 2015 → WGRW12),138,87,-0.039,0.588
+Rrup ≤ 50 km,omurga + sabit kaydırma,138,87,0.377,0.698
+Rrup ≤ 50 km,omurga + LightGBM,138,87,-0.027,0.527
+tümü · istasyon bazlı CV,omurga (Kale 2015 → WGRW12),949,332,-0.416,0.682
+tümü · istasyon bazlı CV,omurga + sabit kaydırma,949,332,0.000,0.547
+tümü · istasyon bazlı CV,omurga + LightGBM,949,332,-0.034,0.490

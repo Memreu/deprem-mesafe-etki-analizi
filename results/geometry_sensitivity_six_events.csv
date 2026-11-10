@@ -1,0 +1,10 @@
+geometri,model,N,sapma,RMSE,N_yakın,RMSE_yakın
+Nokta kaynak,Allen 2012 · Rrup,1324,0.148,1.101,210,1.705
+Nokta kaynak,Kale 2015 → WGRW12,1324,0.288,1.206,210,1.888
+Nokta kaynak,Mantık ağacı (ortalama),1324,0.105,1.069,210,1.592
+GEM izi + Thingbaijam 2017 (otomatik),Allen 2012 · Rrup,1324,-0.160,0.981,210,1.253
+GEM izi + Thingbaijam 2017 (otomatik),Kale 2015 → WGRW12,1324,0.060,1.012,210,1.243
+GEM izi + Thingbaijam 2017 (otomatik),Mantık ağacı (ortalama),1324,-0.058,0.952,210,1.245
+USGS fayı (ShakeMap / FFM; yoksa GEM),Allen 2012 · Rrup,1324,-0.165,0.949,210,1.183
+USGS fayı (ShakeMap / FFM; yoksa GEM),Kale 2015 → WGRW12,1324,0.007,0.991,210,1.181
+USGS fayı (ShakeMap / FFM; yoksa GEM),Mantık ağacı (ortalama),1324,-0.110,0.929,210,1.167

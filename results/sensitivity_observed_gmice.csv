@@ -1,25 +1,25 @@
 küme,model,gözlem_GMICE,N,sapma,RMSE
-Kahramanmaraş (enstrümantal),Allen 2012 · Rrup,WGRW12,304,0.437,0.822
-Kahramanmaraş (enstrümantal),Allen 2012 · Rrup,Bilal & Askan,304,1.207,1.552
-Kahramanmaraş (enstrümantal),Kale 2015 → WGRW12,WGRW12,304,0.867,1.102
-Kahramanmaraş (enstrümantal),Kale 2015 → WGRW12,Bilal & Askan,304,1.637,1.895
-Kahramanmaraş (enstrümantal),Kale 2015 → Bilal & Askan 2014,WGRW12,304,0.568,1.125
-Kahramanmaraş (enstrümantal),Kale 2015 → Bilal & Askan 2014,Bilal & Askan,304,1.338,1.678
-Kahramanmaraş (enstrümantal),Mantık ağacı (ortalama),WGRW12,304,0.620,0.928
-Kahramanmaraş (enstrümantal),Mantık ağacı (ortalama),Bilal & Askan,304,1.390,1.669
-Mw ≥ 6,Allen 2012 · Rrup,WGRW12,54,-0.565,0.891
-Mw ≥ 6,Allen 2012 · Rrup,Bilal & Askan,54,-1.083,1.917
-Mw ≥ 6,Kale 2015 → WGRW12,WGRW12,54,-0.167,0.695
-Mw ≥ 6,Kale 2015 → WGRW12,Bilal & Askan,54,-0.685,1.767
-Mw ≥ 6,Kale 2015 → Bilal & Askan 2014,WGRW12,54,0.201,0.954
-Mw ≥ 6,Kale 2015 → Bilal & Askan 2014,Bilal & Askan,54,-0.317,1.171
-Mw ≥ 6,Mantık ağacı (ortalama),WGRW12,54,-0.478,0.805
-Mw ≥ 6,Mantık ağacı (ortalama),Bilal & Askan,54,-0.996,1.815
+Altı deprem (enstrümantal),Allen 2012 · Rrup,WGRW12,550,0.097,0.850
+Altı deprem (enstrümantal),Allen 2012 · Rrup,Bilal & Askan,550,0.342,1.600
+Altı deprem (enstrümantal),Kale 2015 → WGRW12,WGRW12,550,0.338,0.921
+Altı deprem (enstrümantal),Kale 2015 → WGRW12,Bilal & Askan,550,0.583,1.731
+Altı deprem (enstrümantal),Kale 2015 → Bilal & Askan 2014,WGRW12,550,0.119,1.103
+Altı deprem (enstrümantal),Kale 2015 → Bilal & Askan 2014,Bilal & Askan,550,0.364,1.396
+Altı deprem (enstrümantal),Mantık ağacı (ortalama),WGRW12,550,0.177,0.863
+Altı deprem (enstrümantal),Mantık ağacı (ortalama),Bilal & Askan,550,0.422,1.563
+KOERI Mw ≥ 6,Allen 2012 · Rrup,WGRW12,54,-0.566,0.891
+KOERI Mw ≥ 6,Allen 2012 · Rrup,Bilal & Askan,54,-1.084,1.916
+KOERI Mw ≥ 6,Kale 2015 → WGRW12,WGRW12,54,-0.170,0.690
+KOERI Mw ≥ 6,Kale 2015 → WGRW12,Bilal & Askan,54,-0.688,1.763
+KOERI Mw ≥ 6,Kale 2015 → Bilal & Askan 2014,WGRW12,54,0.197,0.957
+KOERI Mw ≥ 6,Kale 2015 → Bilal & Askan 2014,Bilal & Askan,54,-0.321,1.170
+KOERI Mw ≥ 6,Mantık ağacı (ortalama),WGRW12,54,-0.480,0.804
+KOERI Mw ≥ 6,Mantık ağacı (ortalama),Bilal & Askan,54,-0.998,1.813
 Tüm KOERI,Allen 2012 · Rrup,WGRW12,949,-1.217,1.317
 Tüm KOERI,Allen 2012 · Rrup,Bilal & Askan,949,-1.939,2.094
-Tüm KOERI,Kale 2015 → WGRW12,WGRW12,949,-0.415,0.683
-Tüm KOERI,Kale 2015 → WGRW12,Bilal & Askan,949,-1.138,1.392
+Tüm KOERI,Kale 2015 → WGRW12,WGRW12,949,-0.416,0.682
+Tüm KOERI,Kale 2015 → WGRW12,Bilal & Askan,949,-1.138,1.391
 Tüm KOERI,Kale 2015 → Bilal & Askan 2014,WGRW12,949,0.732,1.064
 Tüm KOERI,Kale 2015 → Bilal & Askan 2014,Bilal & Askan,949,0.010,0.519
-Tüm KOERI,Mantık ağacı (ortalama),WGRW12,949,-0.845,0.976
+Tüm KOERI,Mantık ağacı (ortalama),WGRW12,949,-0.846,0.976
 Tüm KOERI,Mantık ağacı (ortalama),Bilal & Askan,949,-1.568,1.722

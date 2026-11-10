@@ -12,7 +12,7 @@ Ayrıca istasyonlar dışarıda bırakılarak (istasyon bazlı GroupKFold) aynı
 |---|---|---|---|
 | Tümü (deprem bazlı CV) | 0.68 | 0.54 | **0.45** |
 | Tümü (istasyon bazlı CV) | 0.68 | 0.55 | **0.49** |
-| Mw ≥ 6 | 0.69 | 0.72 | **0.66** |
+| Mw ≥ 6 | 0.69 | 0.71 | **0.65** |
 | Rrup ≤ 50 km | 0.59 | 0.70 | **0.53** |
 
 (RMSE, MMI. Ayrıntı: `cv_summary.csv`, `cv_folds.csv`.)

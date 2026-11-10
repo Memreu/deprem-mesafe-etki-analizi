@@ -1,7 +1,9 @@
 """Zemin koşulu (Vs30) ataması.
 
 Öncelik sırası:
-1. USGS Global Vs30 Mosaic rasteri (GeoTIFF). İndirmek için: ``python scripts/download_data.py vs30``.
+1. USGS Global Vs30 Mosaic rasteri. Repoda Türkiye ve çevresi için kırpılmış sürüm vardır
+   (``data/vs30/vs30_turkey.tif``, 24–46°D, 33–43.5°K, 30 yay saniyesi). Küresel ızgara için:
+   ``python scripts/download_data.py vs30`` → ``data/raw/global_vs30.grd``.
    Kaynak: Heath vd. (2020), USGS; topoğrafik eğim vekili Wald & Allen (2007) temellidir.
 2. Kullanıcının verdiği istasyon/nokta Vs30 değerleri.
 3. Sabit referans değer (varsayılan 760 m/s, NEHRP B/C sınırı) — uyarıyla.
@@ -15,7 +17,18 @@ from pathlib import Path
 
 import numpy as np
 
-DEFAULT_RASTER = Path(__file__).resolve().parent.parent / "data" / "raw" / "global_vs30.tif"
+_DATA = Path(__file__).resolve().parent.parent / "data"
+RASTER_CANDIDATES = [_DATA / "vs30" / "vs30_turkey.tif", _DATA / "raw" / "global_vs30.grd", _DATA / "raw" / "global_vs30.tif"]
+
+
+def _default_raster():
+    for p in RASTER_CANDIDATES:
+        if p.exists():
+            return p
+    return RASTER_CANDIDATES[0]
+
+
+DEFAULT_RASTER = _default_raster()
 REFERENCE_VS30 = 760.0
 
 
