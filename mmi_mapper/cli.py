@@ -15,6 +15,7 @@ import numpy as np
 from .coords import parse_coordinate
 from .model import MODEL_LABELS, Event, run_scenario
 from .scale import describe, to_roman
+from .uncertainty import add_uncertainty
 
 
 def _ask_float(prompt: str) -> float:
@@ -54,12 +55,17 @@ def report(df, models=("allen2012_rrup", "bayrak2019", "kale2015_wgrw12", "legac
             sd_txt = "" if np.isnan(sd) else f" ± {sd:.2f}"
             label = describe(mu)[0] if m != "legacy" else "doğrulanmamış"
             print(f"  {MODEL_LABELS[m]:<34}: {mu:5.2f}{sd_txt}  → {to_roman(mu)} ({label})")
+        if "lt_p50" in df:
+            print(f"  {'Mantık ağacı %16 / %50 / %84':<34}: {r.lt_p16:.2f} / {r.lt_p50:.2f} / {r.lt_p84:.2f}"
+                  f"  → {to_roman(r.lt_p50)} ({describe(r.lt_p50)[0]})")
+            print(f"  {'P(MMI ≥ VII) · P(MMI ≥ VIII)':<34}: {r.p_ge_7:.0%} · {r.p_ge_8:.0%}")
 
 
 def run(event: Event, sites, vs30=None, html="deprem_haritasi.html", open_browser=True, rupture_geojson=None):
     lat = [s[0] for s in sites]
     lon = [s[1] for s in sites]
     df, rup = run_scenario(event, lat, lon, vs30=vs30, rupture_geojson=rupture_geojson)
+    df = add_uncertainty(df, finite=rup.is_finite)
     report(df)
     if html:
         from .mapping import scenario_map
