@@ -124,8 +124,6 @@ def main():
 
     # 3) Tüm KOERI
     allres, _ = run_events(koeri, sorted(koeri.event_id.unique()))
-    allres = allres.merge(koeri[["event_id", "station", "window_group"]].drop_duplicates(["event_id", "station"]),
-                          on=["event_id", "station"], how="left")
     allres.to_csv(RES / "residuals_koeri_all.csv", index=False, float_format="%.4f")
     m_all = B.metrics(allres)
     m_all.to_csv(RES / "metrics_koeri_all.csv", index=False, float_format="%.3f")

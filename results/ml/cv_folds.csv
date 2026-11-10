@@ -1,0 +1,16 @@
+kat,yöntem,N,deprem,RMSE,sapma
+1,omurga,190,66,0.689,-0.463
+1,omurga + sabit kaydırma,190,66,0.514,-0.060
+1,omurga + LightGBM,190,66,0.432,-0.055
+2,omurga,190,66,0.687,-0.383
+2,omurga + sabit kaydırma,190,66,0.572,0.041
+2,omurga + LightGBM,190,66,0.489,0.073
+3,omurga,190,67,0.680,-0.415
+3,omurga + sabit kaydırma,190,67,0.539,0.001
+3,omurga + LightGBM,190,67,0.415,-0.010
+4,omurga,190,67,0.655,-0.382
+4,omurga + sabit kaydırma,190,67,0.533,0.042
+4,omurga + LightGBM,190,67,0.423,0.020
+5,omurga,189,66,0.700,-0.436
+5,omurga + sabit kaydırma,189,66,0.549,-0.025
+5,omurga + LightGBM,189,66,0.464,-0.025
