@@ -1,0 +1,8 @@
+grup,model,N,sapma,RMSE,MAE,std
+tümü,Eski formül (doğrulanmamış),8,-1.602,1.813,1.602,0.907
+tümü,Allen 2012 · Rhyp,8,0.139,0.764,0.623,0.803
+tümü,Allen 2012 · Rrup,8,0.396,0.774,0.679,0.711
+tümü,Bayrak 2019 · R3,8,0.123,0.636,0.548,0.667
+tümü,Kale 2015 → WGRW12,8,0.672,0.907,0.840,0.652
+tümü,Kale 2015 → Bilal & Askan 2014,8,0.002,0.703,0.590,0.752
+tümü,Mantık ağacı (ortalama),8,0.385,0.709,0.627,0.637
