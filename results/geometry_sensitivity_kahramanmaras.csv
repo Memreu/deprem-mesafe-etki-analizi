@@ -1,0 +1,10 @@
+geometri,model,N,sapma,RMSE,RMSE_fay_50km
+Nokta kaynak,Allen 2012 · Rrup,552,0.498,1.215,2.356
+Nokta kaynak,Kale 2015 → WGRW12,552,0.825,1.421,2.706
+Nokta kaynak,Mantık ağacı (ortalama),552,0.633,1.218,2.256
+GEM izi + Thingbaijam 2017 (otomatik),Allen 2012 · Rrup,552,0.130,0.915,1.183
+GEM izi + Thingbaijam 2017 (otomatik),Kale 2015 → WGRW12,552,0.500,1.061,1.344
+GEM izi + Thingbaijam 2017 (otomatik),Mantık ağacı (ortalama),552,0.347,0.930,1.091
+USGS ShakeMap fayı,Allen 2012 · Rrup,552,0.100,0.886,1.144
+USGS ShakeMap fayı,Kale 2015 → WGRW12,552,0.483,1.036,1.325
+USGS ShakeMap fayı,Mantık ağacı (ortalama),552,0.321,0.895,1.055

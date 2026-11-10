@@ -21,7 +21,13 @@ def predict_for_observations(event: Event, obs: pd.DataFrame, rupture=None, rupt
     """Gözlem noktalarında tüm modelleri çalıştırır ve artıkları (gözlem − tahmin) ekler."""
     rup = rupture or build_rupture(event.mag, event.lat, event.lon, event.depth, rake=event.rake,
                                    rupture_geojson=rupture_geojson)
-    vs30 = obs["vs30"].to_numpy(float) if "vs30" in obs and obs["vs30"].notna().all() else None
+    # Vs30 nokta bazında: gözlemde varsa o, yoksa raster / referans değer
+    from .site import assign_vs30
+
+    vs30, _ = assign_vs30(obs.lat.to_numpy(), obs.lon.to_numpy())
+    if "vs30" in obs:
+        given = obs["vs30"].to_numpy(float)
+        vs30 = np.where(np.isfinite(given), given, vs30)
     pred, _ = run_scenario(event, obs.lat.to_numpy(), obs.lon.to_numpy(), vs30=vs30, rupture=rup)
     pred = add_uncertainty(pred, finite=rup.is_finite)
     keep = ["repi", "rhyp", "rjb", "rrup", "vs30"] + [c for c in pred.columns

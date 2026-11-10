@@ -204,15 +204,19 @@ def rupture_from_trace(mag, lat, lon, depth, trace_lonlat, rake=0.0, dip=90.0, z
     return rup
 
 
-def rupture_from_geojson(mag, lat, lon, depth, path, rake=0.0, z_scale=1.0, source=None) -> Rupture:
+def rupture_from_geojson(mag, lat, lon, depth, path, rake=0.0, z_scale=None, source=None) -> Rupture:
     """3B çokgenlerden (ShakeMap rupture.json / FFM alt fayları) sonlu fay.
 
     Her halka [boylam, enlem, derinlik] köşelerinden oluşur. 2n köşeli bir halka, ilk n noktası
     üst kenar, son n noktası (ters sırada) alt kenar olacak şekilde n−1 dörtgene bölünür
     (ShakeMap rupture.json düzeni; 4 köşeli FFM alt fayları da bu düzene uyar).
-    ``z_scale`` derinliği km'ye çevirir (ör. metre için 0.001).
+    ``z_scale`` derinliği km'ye çevirir (ör. metre için 0.001). Verilmezse otomatik seçilir: en büyük derinlik
+    100'den büyükse metre kabul edilir (USGS FFM.geojson metre, ShakeMap rupture.json km kullanır).
     """
     gj = json.loads(Path(path).read_text())
+    if z_scale is None:
+        zs = [c[2] for c in _iter_coords(gj) if len(c) > 2]
+        z_scale = 0.001 if zs and max(zs) > 100 else 1.0
     feats = gj["features"] if gj.get("type") == "FeatureCollection" else [gj]
     rup = Rupture(mag=mag, lat=lat, lon=lon, depth=depth, rake=rake, source=source or Path(path).name)
     for f in feats:
@@ -234,9 +238,23 @@ def rupture_from_geojson(mag, lat, lon, depth, path, rake=0.0, z_scale=1.0, sour
     if rup.quads:
         rup.ztor = float(min(q[:, 2].min() for q in rup.quads))
         rup.dip = _mean_dip(rup.quads)
-        rup.length = float(sum(np.linalg.norm(q[1, :2] - q[0, :2]) for q in rup.quads))
+        # Uzunluk: en sığ sıradaki dörtgenlerin üst kenar uzunlukları toplamı (FFM ızgarasında yalnızca üst sıra)
+        top = [q for q in rup.quads if q[:2, 2].min() <= rup.ztor + 0.5]
+        rup.length = float(sum(np.linalg.norm(q[1, :2] - q[0, :2]) for q in top))
         rup.width = float(np.mean([np.linalg.norm(q[3] - q[0]) for q in rup.quads]))
     return rup
+
+
+def _iter_coords(obj):
+    if isinstance(obj, dict):
+        for v in obj.values():
+            yield from _iter_coords(v)
+    elif isinstance(obj, list):
+        if obj and all(isinstance(x, (int, float)) for x in obj):
+            yield obj
+        else:
+            for v in obj:
+                yield from _iter_coords(v)
 
 
 def _mean_dip(quads) -> float:
@@ -366,7 +384,7 @@ def rupture_from_gem(mag, lat, lon, depth, rake=None, faults=None, search_km=25.
                               source=f"GEM GAF-DB izi ({f0['catalog_id']}) + Thingbaijam 2017")
 
 
-def build_rupture(mag, lat, lon, depth, rake=None, rupture_geojson=None, z_scale=1.0, use_finite=None) -> Rupture:
+def build_rupture(mag, lat, lon, depth, rake=None, rupture_geojson=None, z_scale=None, use_finite=None) -> Rupture:
     """Önerilen varsayılan: FFM/rupture dosyası varsa onu, yoksa Mw ≥ 6.5 için GEM tabanlı sonlu fay."""
     if rupture_geojson:
         return rupture_from_geojson(mag, lat, lon, depth, rupture_geojson, rake=rake or 0.0, z_scale=z_scale)

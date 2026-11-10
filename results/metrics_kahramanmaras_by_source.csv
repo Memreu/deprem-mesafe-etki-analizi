@@ -1,0 +1,22 @@
+grup,model,N,sapma,RMSE,MAE,std
+AFAD (ShakeMap),Eski formül (doğrulanmamış),296,-1.417,1.707,1.535,0.954
+AFAD (ShakeMap),Allen 2012 · Rhyp,296,0.310,0.971,0.741,0.922
+AFAD (ShakeMap),Allen 2012 · Rrup,296,0.438,0.824,0.661,0.699
+AFAD (ShakeMap),Bayrak 2019 · R3,296,0.458,1.020,0.790,0.913
+AFAD (ShakeMap),Kale 2015 → WGRW12,296,0.871,1.107,0.933,0.683
+AFAD (ShakeMap),Kale 2015 → Bilal & Askan 2014,296,0.582,1.134,0.955,0.975
+AFAD (ShakeMap),Mantık ağacı (ortalama),296,0.626,0.933,0.771,0.694
+KOERI,Eski formül (doğrulanmamış),8,-1.602,1.813,1.602,0.907
+KOERI,Allen 2012 · Rhyp,8,0.139,0.764,0.623,0.803
+KOERI,Allen 2012 · Rrup,8,0.400,0.773,0.682,0.707
+KOERI,Bayrak 2019 · R3,8,0.123,0.636,0.548,0.667
+KOERI,Kale 2015 → WGRW12,8,0.698,0.935,0.866,0.664
+KOERI,Kale 2015 → Bilal & Askan 2014,8,0.033,0.671,0.559,0.717
+KOERI,Mantık ağacı (ortalama),8,0.402,0.722,0.645,0.640
+USGS DYFI,Eski formül (doğrulanmamış),248,-2.142,2.403,2.218,1.091
+USGS DYFI,Allen 2012 · Rhyp,248,-0.513,1.149,0.947,1.030
+USGS DYFI,Allen 2012 · Rrup,248,-0.313,0.958,0.779,0.907
+USGS DYFI,Bayrak 2019 · R3,248,-0.296,1.035,0.813,0.994
+USGS DYFI,Kale 2015 → WGRW12,248,0.012,0.949,0.755,0.951
+USGS DYFI,Kale 2015 → Bilal & Askan 2014,248,0.332,1.006,0.774,0.952
+USGS DYFI,Mantık ağacı (ortalama),248,-0.046,0.853,0.676,0.854

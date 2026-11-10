@@ -41,7 +41,11 @@ def main():
     table, places, _ = exposure(ev, 3.0, rupture=rup)
     table.to_csv(RES / "kahramanmaras_exposure.csv", index=False, float_format="%.0f")
     places.to_csv(RES / "kahramanmaras_places.csv", index=False, float_format="%.3f")
-    obs = O.load_koeri(event_id="us6000jllz")
+    import pandas as pd
+
+    usgs = pd.read_csv(ROOT / "data" / "observations" / "usgs_observations.csv")
+    afad = usgs[(usgs.event_id == "us6000jllz") & (usgs.source == "AFAD (ShakeMap)")]
+    obs = pd.concat([O.load_koeri(event_id="us6000jllz"), afad], ignore_index=True)
     layered_map(ev, g, rup, obs, places).save(RES / "kahramanmaras_map.html")
 
     ny, nx = g.attrs["grid_shape"]
@@ -60,7 +64,7 @@ def main():
             xs, ys = zip(*seg)
             ax.plot(xs, ys, color="k", lw=2.2)
         ax.plot(ev.lon, ev.lat, marker="*", ms=14, color="k", mec="w")
-        ax.scatter(obs.lon, obs.lat, marker="^", s=40, c="w", edgecolors="k", zorder=5)
+        ax.scatter(obs.lon, obs.lat, marker="^", s=14, c="w", edgecolors="k", linewidths=0.6, zorder=5)
         for _, r in top.iterrows():
             ax.plot(r.lon, r.lat, "o", ms=3, color="k")
             ax.annotate(r["name"], (r.lon, r.lat), fontsize=7, xytext=(3, 3), textcoords="offset points")
@@ -73,7 +77,7 @@ def main():
             cb.set_ticklabels(["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"])
     axes[0].set_ylabel("Enlem")
     fig.suptitle("Kahramanmaraş (Pazarcık) Mw 7.8 — 6 Şubat 2023 · siyah çizgi: GEM izi + Thingbaijam (2017) fayı, "
-                 "üçgen: KOERI istasyonları", fontsize=11)
+                 "üçgen: KOERI ve AFAD istasyonları", fontsize=11)
     fig.savefig(IMG / "kahramanmaras_mmi_map.png", dpi=130)
     plt.close(fig)
 

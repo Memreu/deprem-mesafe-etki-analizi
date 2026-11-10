@@ -10,11 +10,14 @@ from mmi_mapper.model import Event
 
 def test_dyfi_parser_with_comment_header(tmp_path):
     f = tmp_path / "cdi_geo.txt"
-    f.write_text("# Geocoded box, CDI, No. of responses, Hypocentral distance, Latitude, Longitude\n"
-                 "UTM:(37S 0300 4120 1000),7.1,12,40,37.2,37.0\n"
-                 "UTM:(37S 0310 4120 1000),5.0,1,90,37.5,37.4\n")
+    # USGS cdi_geo.txt biçimi (us6000jllz dosyasından örnek satır yapısı)
+    f.write_text("# Columns: Geocoded box,CDI,No. of responses,Hypocentral distance,Latitude,Longitude,Suspect?,"
+                 "Standard deviation,City,State\n"
+                 '"UTM:(37S 0300 4120 1000)",7.1,12,40,37.2,37.0,0,0.2,"UTM:(37S 0300 4120 1000)",""\n'
+                 '"UTM:(37S 0310 4120 1000)",5.0,1,90,37.5,37.4,0,0.3,"x, y",""\n'
+                 '"UTM:(37S 0320 4120 1000)",8.0,9,90,37.6,37.4,1,0.3,"z",""\n')
     d = O.load_dyfi(f, min_responses=3)
-    assert len(d) == 1 and d.obs_mmi.iloc[0] == pytest.approx(7.1)
+    assert len(d) == 1 and d.obs_mmi.iloc[0] == pytest.approx(7.1)  # 1 yanıtlı ve şüpheli hücreler atılır
 
 
 def test_shakemap_stationlist_channels(tmp_path):
@@ -39,3 +42,15 @@ def test_koeri_benchmark_small_event():
                                       k[k.event_id == eid])
     m = metrics(res)
     assert {"sapma", "RMSE"} <= set(m.columns) and np.isfinite(m.RMSE).all()
+
+
+def test_ffm_depth_in_meters_autodetected(tmp_path):
+    from mmi_mapper.rupture import rupture_from_geojson
+
+    ring = [[37.0, 37.0, 1000.0], [37.2, 37.1, 1000.0], [37.21, 37.08, 6000.0], [37.01, 36.98, 6000.0],
+            [37.0, 37.0, 1000.0]]
+    f = tmp_path / "FFM.geojson"
+    f.write_text(json.dumps({"type": "FeatureCollection", "features": [
+        {"type": "Feature", "properties": {}, "geometry": {"type": "Polygon", "coordinates": [ring]}}]}))
+    r = rupture_from_geojson(7.0, 37.0, 37.0, 10.0, f)
+    assert r.ztor == pytest.approx(1.0) and max(q[:, 2].max() for q in r.quads) == pytest.approx(6.0)

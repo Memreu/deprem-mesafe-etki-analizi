@@ -52,22 +52,27 @@ def _find(cols, *patterns):
 
 
 def load_dyfi(path, min_responses: int = 3) -> pd.DataFrame:
-    """USGS DYFI geokodlu/ilçe tablosu (cdi_geo*.txt, cdi_zip.txt).
+    """USGS DYFI geokodlu/ilçe tablosu (cdi_geo.txt, cdi_geo_1km.txt, cdi_zip.txt).
 
-    Sütun adları sürümden sürüme değiştiği için CDI, enlem, boylam ve yanıt sayısı sütunları adlarına göre aranır.
-    Allen vd. (2012) ve DYFI uygulamasındaki yaygın tercihle en az ``min_responses`` yanıtlı hücreler tutulur.
+    Biçim: ``# Columns: Geocoded box,CDI,No. of responses,Hypocentral distance,Latitude,Longitude,Suspect?,...``
+    başlık satırı ve tırnaklı CSV satırları. Şüpheli (Suspect? = 1) hücreler atılır; en az ``min_responses``
+    yanıtlı hücreler tutulur.
     """
-    text = Path(path).read_text(errors="replace").splitlines()
+    import csv
+
+    lines = Path(path).read_text(encoding="utf-8", errors="replace").splitlines()
     header = None
     rows = []
-    for line in text:
+    for line in lines:
         if line.startswith("#"):
-            cand = [c.strip() for c in line.lstrip("#").split(",")]
-            if any(re.search("cdi|mmi", c, re.I) for c in cand):
+            body = line.lstrip("#").strip()
+            body = body.split(":", 1)[1] if body.lower().startswith("columns:") else body
+            cand = [c.strip().rstrip("[").strip() for c in body.replace("[,", ",").replace("]", "").split(",")]
+            if any(re.fullmatch("cdi|mmi", c, re.I) for c in cand):
                 header = cand
             continue
         if line.strip():
-            rows.append([c.strip() for c in line.split(",")])
+            rows.append(next(csv.reader([line])))
     if header is None:
         df = pd.read_csv(path)
     else:
@@ -78,13 +83,19 @@ def load_dyfi(path, min_responses: int = 3) -> pd.DataFrame:
     c_lat = _find(cols, r"lat(itude)?")
     c_lon = _find(cols, r"lon(gitude)?")
     c_n = _find(cols, r"(no\.? of )?responses?", r"nresp", r"n_resp", r"numresp")
+    c_sus = _find(cols, r"suspect\??")
+    c_dist = _find(cols, r"hypocentral distance")
     if None in (c_cdi, c_lat, c_lon):
         raise ValueError(f"DYFI dosyasında CDI/enlem/boylam sütunları bulunamadı: {cols}")
     out = pd.DataFrame({"lat": pd.to_numeric(df[c_lat], errors="coerce"),
                         "lon": pd.to_numeric(df[c_lon], errors="coerce"),
                         "obs_mmi": pd.to_numeric(df[c_cdi], errors="coerce")})
+    if c_dist is not None:
+        out["dyfi_rhyp_km"] = pd.to_numeric(df[c_dist], errors="coerce")
+    if c_sus is not None:
+        out = out[pd.to_numeric(df[c_sus], errors="coerce").fillna(0).to_numpy() == 0]
     if c_n is not None:
-        out["n_resp"] = pd.to_numeric(df[c_n], errors="coerce")
+        out["n_resp"] = pd.to_numeric(df.loc[out.index, c_n], errors="coerce")
         out = out[out.n_resp >= min_responses]
     out = out.dropna(subset=["lat", "lon", "obs_mmi"])
     out["obs_type"], out["source"] = "DYFI", "USGS DYFI"
@@ -102,15 +113,21 @@ def load_shakemap_stations(path, networks: tuple[str, ...] | None = None) -> pd.
     rows = []
     for f in gj.get("features", []):
         p = f.get("properties", {})
-        if str(p.get("station_type", "seismic")).lower() not in ("seismic", "") and "channels" not in p:
+        # ShakeMap istasyon listesi DYFI hücrelerini de "macroseismic" olarak içerir; yalnızca sismik istasyonlar
+        if str(p.get("station_type", "seismic")).lower() != "seismic":
             continue
+        flags = [str(a.get("flag", "0")) for ch in p.get("channels", []) for a in ch.get("amplitudes", [])
+                 if str(a.get("name", "")).lower() == "pgv" and not str(ch.get("name", "")).upper().endswith("Z")]
+        if flags and all(f != "0" for f in flags):
+            continue  # ShakeMap'in aykırı (Outlier) olarak işaretlediği istasyonlar
         net = str(p.get("network", p.get("source", "")))
         if networks and net not in networks:
             continue
         pgv = p.get("pgv")
         if not isinstance(pgv, (int, float)):
             vals = [a.get("value") for ch in p.get("channels", []) for a in ch.get("amplitudes", [])
-                    if str(a.get("name", "")).lower() == "pgv" and isinstance(a.get("value"), (int, float))]
+                    if str(a.get("name", "")).lower() == "pgv" and isinstance(a.get("value"), (int, float))
+                    and str(a.get("flag", "0")) == "0" and not str(ch.get("name", "")).upper().endswith("Z")]
             pgv = max(vals) if vals else None
         if pgv is None or pgv <= 0:
             continue
@@ -142,3 +159,29 @@ def load_field_map(path, scale: str = "MMI") -> pd.DataFrame:
     out = pd.DataFrame({"lat": df["lat"], "lon": df["lon"], "obs_mmi": pd.to_numeric(df[c], errors="coerce")})
     out["obs_type"], out["source"] = "saha", f"saha haritası ({scale})"
     return out.dropna()
+
+
+def vs30_from_stationlist(df: pd.DataFrame, path, max_km: float = 7.0) -> pd.DataFrame:
+    """Vs30'u eksik noktalara, ShakeMap stationlist.json'daki en yakın noktanın Vs30 değerini atar.
+
+    ShakeMap, istasyon listesindeki her noktaya (sismik istasyon ve DYFI hücresi) USGS Global Vs30 ızgarasından
+    değer atar. USGS rasteri indirilemediğinde bu değerler ``max_km`` içindeki en yakın komşu ile kullanılır.
+    """
+    from .coords import haversine_km
+
+    gj = json.loads(Path(path).read_text())
+    pts = np.array([(f["geometry"]["coordinates"][1], f["geometry"]["coordinates"][0], f["properties"]["vs30"])
+                    for f in gj.get("features", []) if isinstance(f["properties"].get("vs30"), (int, float))])
+    df = df.copy()
+    if "vs30" not in df:
+        df["vs30"] = np.nan
+    df["vs30_source"] = np.where(df["vs30"].notna(), "gözlem", "")
+    if len(pts) == 0:
+        return df
+    for i in np.where(df["vs30"].isna())[0]:
+        d = haversine_km(df.lat.iloc[i], df.lon.iloc[i], pts[:, 0], pts[:, 1])
+        j = int(np.argmin(d))
+        if d[j] <= max_km:
+            df.iloc[i, df.columns.get_loc("vs30")] = pts[j, 2]
+            df.iloc[i, df.columns.get_loc("vs30_source")] = "ShakeMap (en yakın komşu)"
+    return df
