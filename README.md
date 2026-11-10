@@ -14,8 +14,8 @@
 - 🧭 **Yüzeysel ve hiposantrik mesafe hesaplamaları**  
   En doğru sismik analiz için yer yüzeyinden ve yer altındaki depremin merkezine olan uzaklıklar hesaplanır.
 
-- 📈 **MMI ve Mw hesaplamaları**  
-  Kullanıcının verdiği Mw değeriyle MMI hesaplanır. Aynı zamanda hissedilen MMI'dan geri tahminle yaklaşık Mw da verilir.
+- 📈 **Yayımlanmış modellerle MMI hesabı**  
+  Allen vd. (2012) ve Bayrak vd. (2019) IPE'leriyle medyan MMI ve standart sapma hesaplanır.
 
 - 🎨 **Terminalde renkli çıktı**  
   MMI şiddeti kullanıcıya renkli ve anlamlı açıklamalarla sunulur (örn: Hafif, Orta, Yıkıcı).
@@ -30,7 +30,7 @@
 Bu proje pek çok Python ile çalışır. Kütüphaneler script içerisinde otomatik olarak kurulsa da manuel kurulum için:
 
 ```bash
-pip install folium geopy colorama
+pip install -r requirements.txt
 ```
 
 ---
@@ -58,17 +58,23 @@ Harita açıklamaları:
 
 ---
 
-## 📚 Bilimsel Arka Plan
-**MMI Hesabı:**
-- MMI = 1.62 + 1.22Mw - 0.00255R - 1.29log10(R)
-- Bu formül, hiposantr uzaklığına göre zayıflayan deprem ivmesini baz alır.
--- **Mw**: Moment büyüklüğü
--- **R**: Hiposantr uzaklığı (km)
-> Formül, depremin şiddetinin mesafeye ve büyüklüğe göre logaritmik olarak zayıflamasına dayalıdır.
+## 📚 Teorik Arka Plan
 
-#### **Yaklaşık Mw Hesabı:**
-- MMI değerinden yaklaşık olarak hissedilen Mw değeri tahmin edilir. Bu tahmin, ampirik ilişkilere dayalıdır ve mühendislik hesaplamalarına referans niteliğindedir.
-- Bu sistem yalnızca deprem büyüklüğü ve mesafeye göre analiz yapar. Zemin tipi, yapı dayanımı gibi faktörleri içermemektedir.
+Bir konumdaki şiddeti tahmin etmenin kabul görmüş iki yolu vardır: büyüklük ve uzaklıktan doğrudan şiddet veren **şiddet tahmin denklemleri (IPE)** ya da önce yer hareketini (PGV) tahmin edip bunu şiddete çeviren **GMPE + GMICE zinciri**. Ayrıntılar: [`docs/literatur_taramasi.pdf`](docs/literatur_taramasi.pdf).
+
+**Kullanılan IPE'ler** (`mmi_mapper/ipe.py`):
+
+| Model | Uzaklık | Denklem | σ (MMI) |
+|---|---|---|---|
+| Allen, Wald & Worden (2012), Rrup | fay uzaklığı | `3.950 + 0.913·M − 1.107·ln√(Rrup² + (1 + 0.813·e^(M−5))²)` | `0.72 + 0.23/(1+(R/44.7)²)` |
+| Allen, Wald & Worden (2012), Rhyp | hiposantral | `2.085 + 1.428·M − 1.402·ln√(Rhyp² + Rm²) + 0.078·ln(Rhyp/50)` (R>50 km), `Rm = −0.209 + 2.042·e^(M−5)` | `0.82 + 0.37/(1+(R/22.9)²)` |
+| Bayrak, Nas & Bayrak (2019), R3 — Türkiye | episantral + derinlik | `7.494 + 0.744·Mw − 3.377·log((Repi³+h³)^(1/3)) + 0.017·h` | 1.270 |
+
+Allen 2012 katsayıları OpenQuake `AllenEtAl2012` / `AllenEtAl2012Rhypo` sınıflarından, Bayrak 2019 katsayıları makalenin Tablo 4'ünden alınmıştır (R1–R4 dördü de kodda mevcuttur). Bayrak 2019'da logaritmanın tabanı açıkça belirtilmediği için log10 varsayılmıştır.
+
+> ⚠️ **Eski formül kaldırıldı.** İlk sürümdeki `MMI = 1.62 + 1.22·Mw − 0.00255·R − 1.29·log10(R)` için yayımlanmış bir kaynak bulunamadı. Allen vd. (2012)'ye göre 100–300 km aralığında şiddeti **1,6–2,2 MMI fazla** tahmin ediyor (bkz. `tests/test_ipe.py`). Yalnızca karşılaştırma için `legacy_unverified` adıyla tutulur.
+>
+> **MMI → Mw dönüşümü kaldırıldı.** Büyüklük depremin, şiddet konumun özelliğidir. Bir noktadaki şiddetten depremin büyüklüğü geri hesaplanamaz.
 
 ---
 ## 📖 Literatür Taraması
