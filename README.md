@@ -71,6 +71,10 @@ Harita açıklamaları:
 - Bu sistem yalnızca deprem büyüklüğü ve mesafeye göre analiz yapar. Zemin tipi, yapı dayanımı gibi faktörleri içermemektedir.
 
 ---
+## 📖 Literatür Taraması
+
+Projenin teorik temeli için hazırlanan kapsamlı literatür taraması: [`docs/literatur_taramasi.pdf`](docs/literatur_taramasi.pdf) (29 sayfa). Şiddet tahmin denklemleri (IPE), GMPE + GMICE zinciri, Türkiye'ye özgü modeller, zemin etkisi (Vs30), sonlu fay, belirsizlik, ShakeMap/AFAD/KOERI, Kahramanmaraş 2023 dersleri ve aşamalı geliştirme yol haritasını kapsar.
+
 ## 🔗 Kaynaklar ve Referanslar
 
 - 📊 AFAD Türkiye Deprem Tehlike Haritası (TDTH)
