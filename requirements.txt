@@ -20,3 +20,15 @@ h3>=4
 requests
 fiona>=1.9
 geopandas>=0.14
+
+# Doğrulama, ML ve sunum
+matplotlib>=3.8
+scikit-learn>=1.4
+lightgbm>=4.3
+shap>=0.45
+geonamescache>=2.0
+streamlit>=1.35
+pytest>=8
+nbformat
+nbconvert
+ipykernel

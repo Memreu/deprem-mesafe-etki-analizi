@@ -1,112 +1,268 @@
-# 🌍 MMI Intensity Mapper
+# 🌍 MMI Intensity Mapper — Deprem Şiddeti Haritalama
 
-**MMI Intensity Mapper**, kullanıcıdan alınan deprem ve konum bilgilerini kullanarak, sarsıntının farklı noktalarda nasıl hissedildiğini tahmin eden bir analiz ve görselleştirme aracıdır. Uygulama, deprem büyüklüğü (**Mw**), episantr uzaklığı ve derinlik bilgilerini temel alarak **Modified Mercalli Intensity (MMI)** değerini hesaplar ve sonuçları **etkileşimli bir HTML haritası** üzerinde görsel olarak sunar.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/OpenQuake-hazardlib_3.26-1F6FB2" alt="OpenQuake">
+  <img src="https://img.shields.io/badge/LightGBM-monoton_artık_modeli-9ACD32" alt="LightGBM">
+  <img src="https://img.shields.io/badge/RMSE-0.68→0.45_MMI-29A36A" alt="RMSE">
+  <img src="https://img.shields.io/badge/test-24_geçti-2EA44F?logo=pytest&logoColor=white" alt="Testler">
+  <img src="https://img.shields.io/badge/lisans-MIT-lightgrey" alt="MIT">
+</p>
 
-> Proje Python ile geliştirilmiş olup, haritalama için `folium`, mesafe hesaplamaları için `geopy`, renkli terminal çıktısı için `colorama` kullanmaktadır.
+<p align="center">
+  <a href="notebooks/kahramanmaras_demo.ipynb"><img src="https://img.shields.io/badge/📓_Demo_notebook-Jupyter-F37626?logo=jupyter&logoColor=white" alt="Notebook"></a>
+  <a href="app/streamlit_app.py"><img src="https://img.shields.io/badge/Arayüz-Streamlit-FF4B4B?logo=streamlit&logoColor=white" alt="Streamlit"></a>
+  <a href="docs/literatur_taramasi.pdf"><img src="https://img.shields.io/badge/📖_Literatür_taraması-29_sayfa-6E5494" alt="Literatür"></a>
+  <a href="https://www.kaggle.com/memreu"><img src="https://img.shields.io/badge/Kaggle-memreu-20BEFF?logo=kaggle&logoColor=white" alt="Kaggle"></a>
+</p>
 
----
+Olmuş bir depremin büyüklüğü, konumu ve derinliğinden, farklı noktalarda sarsıntının **Değiştirilmiş Mercalli Şiddeti (MMI)** cinsinden nasıl hissedildiğini tahmin eden, Türkiye odaklı, açık ve tekrarlanabilir bir Python aracı. Yayımlanmış şiddet modellerini (IPE), OpenQuake üzerinden **GMPE + GMICE** zincirini, **sonlu fay** geometrisini, **zemin (Vs30)** etkisini, **belirsizlik** bantlarını ve gözlemle **doğrulamayı** tek bir pakette birleştirir.
 
-## 📌 Özellikler
+> Bu araç **olmuş bir depremin etkisini** tahmin eder. Gelecekteki depremlerin zamanını, yerini ya da büyüklüğünü **tahmin etmez**.
 
-- 📍 **DMS formatında koordinat girişi**  
-  Kullanıcılar hem deprem episantrı hem de analiz yapılacak konumları DMS (derece, dakika, saniye) formatında girebilirler.
-  
-- 🧭 **Yüzeysel ve hiposantrik mesafe hesaplamaları**  
-  En doğru sismik analiz için yer yüzeyinden ve yer altındaki depremin merkezine olan uzaklıklar hesaplanır.
+<p align="center"><img src="images/kahramanmaras_mmi_map.png" width="100%"></p>
 
-- 📈 **Yayımlanmış modellerle MMI hesabı**  
-  Allen vd. (2012) ve Bayrak vd. (2019) IPE'leriyle medyan MMI ve standart sapma hesaplanır.
+> 🇬🇧 **In English:** A lightweight, documented and validated rapid-intensity tool for Türkiye. It replaces an unsourced legacy formula with published models: Allen, Wald & Worden (2012) and Bayrak et al. (2019) IPEs, plus a Kale et al. (2015) GMPE → Worden et al. (2012) / Bilal & Askan (2014) GMICE chain run through OpenQuake. Large events use a finite fault built from GEM active-fault traces and Thingbaijam et al. (2017) scaling. A four-branch logic tree yields 16/50/84th percentiles and P(MMI ≥ VII/VIII). Against KOERI strong-motion records of 18 Turkish Mw ≥ 6 earthquakes, the legacy formula over-predicts by **2.4 MMI** (RMSE 2.45), while the GMPE+GMICE chain has a bias of **−0.17** (RMSE 0.69). A monotonic-constrained LightGBM residual model, validated with event-grouped CV, lowers out-of-fold RMSE from **0.68 to 0.45** across 949 records. Outputs include a PAGER-style population exposure table, a layered Folium map, a Streamlit app and CI tests that check the IPEs against OpenQuake.
 
-- 🎨 **Terminalde renkli çıktı**  
-  MMI şiddeti kullanıcıya renkli ve anlamlı açıklamalarla sunulur (örn: Hafif, Orta, Yıkıcı).
+<details>
+<summary><b>📑 İçindekiler</b></summary>
 
-- 🗺️ **Etkileşimli harita çıktısı**  
-  Folium kullanılarak oluşturulan HTML haritada deprem ve kullanıcı konumları işaretlenir, mesafeler ve tahmini etkiler gösterilir.
+- [Öne çıkan sonuçlar](#öne-çıkan-sonuçlar)
+- [Neden yeniden yazıldı?](#neden-yeniden-yazıldı)
+- [Yöntem](#yöntem)
+- [Doğrulama sonuçları](#doğrulama-sonuçları)
+- [Makine öğrenmesi: artık modeli](#makine-öğrenmesi-artık-modeli)
+- [Nüfus maruziyeti](#nüfus-maruziyeti)
+- [Kurulum ve çalıştırma](#kurulum-ve-çalıştırma)
+- [Klasör yapısı](#klasör-yapısı)
+- [Veri ve lisanslar](#veri-ve-lisanslar)
+- [Sınırlılıklar ve sonraki adımlar](#sınırlılıklar-ve-sonraki-adımlar)
+- [Kaynaklar](#kaynaklar)
 
----
+</details>
 
-## 🛠️ Kurulum
+## Öne çıkan sonuçlar
 
-Bu proje pek çok Python ile çalışır. Kütüphaneler script içerisinde otomatik olarak kurulsa da manuel kurulum için:
+| | Sonuç |
+|---|---|
+| ❌ **Eski formül** | Kaynağı bulunamadı. Türkiye Mw ≥ 6 depremlerinde ortalama **2,4 MMI fazla** tahmin ediyor (RMSE 2,45) |
+| 📐 **Yerine gelen modeller** | Allen 2012 (Rrup/Rhyp), Bayrak 2019 (Türkiye), Kale 2015 → WGRW12 / Bilal & Askan 2014 |
+| 🎯 **En iyi fiziksel model** | Kale 2015 → WGRW12: Mw ≥ 6'da sapma **−0,17**, RMSE **0,69** MMI |
+| 🧭 **Sonlu fay** | Kahramanmaraş Mw 7.8: Antakya'ya episantral uzaklık 137 km, fay uzaklığı **20 km** → tahmin VI'dan **VIII**'e çıkıyor |
+| 🎲 **Belirsizlik** | 4 dallı mantık ağacı · %16/%50/%84 · P(MMI ≥ VII), P(MMI ≥ VIII) haritaları |
+| 🤖 **ML katkısı** | Monoton kısıtlı LightGBM artık modeli: katman dışı RMSE **0,68 → 0,45** (istasyon bazlı CV'de 0,49) |
+| 🧱 **Zemin** | Vs30'un artıklara ek katkısı neredeyse sıfır (|SHAP| ≈ 0,001); Allen vd. (2012) bulgusuyla uyumlu |
+| 👥 **Maruziyet** | Kahramanmaraş Mw 7.8 senaryosunda medyan tahminle **2,3 milyon** kişi (≥ 15 000 nüfuslu yerleşimlerde) MMI ≥ VII |
+
+## Neden yeniden yazıldı?
+
+Projenin ilk sürümü `MMI = 1.62 + 1.22·Mw − 0.00255·R − 1.29·log10(R)` formülünü kullanıyordu. Literatür taramasında ([`docs/literatur_taramasi.pdf`](docs/literatur_taramasi.pdf)) bu formülün yayımlanmış bir kaynağı bulunamadı. Formül, Allen vd. (2012)'ye göre 100–300 km'de şiddeti **1,6–2,2 MMI** fazla tahmin ediyordu; gerçek gözlemler bunu doğruladı. Ayrıca:
+
+- **Nokta kaynak varsayımı** büyük depremlerde çöküyordu (Mw 7.8 için Thingbaijam vd. 2017 medyan fay uzunluğu 234 km).
+- **Zemin** ve **belirsizlik** hesapta yoktu.
+- MMI'dan Mw'ye "geri dönüşüm" bilimsel olarak geçersizdi: büyüklük depremin, şiddet konumun özelliğidir. Bu fonksiyon kaldırıldı.
+
+Eski formül, karşılaştırma amacıyla `legacy_unverified` adıyla ve "doğrulanmamış" etiketiyle tutuluyor.
+
+<p align="center"><img src="images/attenuation_comparison.png" width="70%"></p>
+
+## Yöntem
+
+### Modeller
+
+| Model | Tür | Girdiler | Katsayı kaynağı |
+|---|---|---|---|
+| Allen, Wald & Worden (2012) · Rrup | IPE (küresel) | Mw, Rrup | OpenQuake `AllenEtAl2012` |
+| Allen, Wald & Worden (2012) · Rhyp | IPE (küresel) | Mw, Rhyp | OpenQuake `AllenEtAl2012Rhypo` |
+| Bayrak, Nas & Bayrak (2019) · R3 | IPE (Türkiye) | Mw, Repi, derinlik | Makale, Tablo 4 (R1–R4 kodda) |
+| Kale vd. (2015) → Worden vd. (2012) | GMPE + GMICE | Mw, Rjb, Vs30, rake | OpenQuake `KaleEtAl2015Turkey` + USGS `esi-shakelib` WGRW12 |
+| Kale vd. (2015) → Bilal & Askan (2014) | GMPE + GMICE (Türkiye) | Mw, Rjb, Vs30, rake | OpenQuake + makale özeti |
+| ~~Eski formül~~ | doğrulanmamış | Mw, Rhyp | — |
+
+Katsayılar hafızadan yazılmadı. Testler Allen 2012 sonuçlarını OpenQuake ile 1e-10 hassasiyetinde, fay uzaklıklarını OpenQuake `PlanarSurface` ile 0,3 km içinde karşılaştırır.
+
+### Kaynak geometrisi
+
+- **Mw < 6.5:** nokta kaynak (Rjb ≈ Repi, Rrup ≈ Rhyp).
+- **Mw ≥ 6.5:** sonlu fay. USGS FFM ya da ShakeMap `rupture.json` verilirse doğrudan kullanılır. Verilmezse episantr çevresindeki GEM Global Active Faults izleri uç uca zincirlenir ve episantrın izdüşümü etrafında Thingbaijam vd. (2017) ölçek yasasıyla L uzunluğunda (Mw 7.8 doğrultu atımlı için 234 km), W genişliğinde bir parça kesilir.
+- Rjb, fay izdüşümüne olan uzaklıktır ve `shapely` ile hesaplanır. Rrup düşey faylarda `shapely` ile, eğimli faylarda 1 km aralıklı yüzey ağıyla hesaplanır.
+
+### Zemin
+
+Her noktaya USGS Global Vs30 Mosaic rasterinden `rasterio` ile Vs30 atanır (`scripts/download_data.py vs30`). Raster yoksa 760 m/s referans değeri kullanılır ve kullanıcı uyarılır. Doğrulamada istasyonların kendi Vs30 değerleri kullanıldı.
+
+### Belirsizlik ve mantık ağacı
+
+Her dal bir noktada MMI ~ N(μ, σ) verir. GMPE+GMICE zincirinde σ² = (dMMI/dlnPGV · σ_lnPGV)² + σ²_GMICE. Mantık ağacı dalların ağırlıklı karışımıdır. %16/%50/%84 değerleri karışımın ters dağılım fonksiyonundan, aşma olasılığı ise P(MMI ≥ k) = Σ wᵢ[1 − Φ((k − μᵢ)/σᵢ)] ile hesaplanır.
+
+| Dal | Ağırlık | Sonlu fayda |
+|---|---|---|
+| Allen 2012 · Rrup | 0.30 | 0.35 |
+| Kale 2015 → WGRW12 | 0.30 | 0.35 |
+| Kale 2015 → Bilal & Askan 2014 | 0.20 | 0.24 |
+| Bayrak 2019 · R3 | 0.20 | 0.06 (episantral uzaklık kullandığı için) |
+
+Gerekçeler: [`docs/logic_tree.md`](docs/logic_tree.md).
+
+## Doğrulama sonuçları
+
+Gözlemler: KOERI kuvvetli yer hareketi kayıtları. PGV'ler Worden vd. (2012) ile enstrümantal MMI'ya çevrildi. Artık = gözlem − tahmin; **negatif sapma, modelin fazla tahmin ettiğini** gösterir. Tüm tablolar ve grafikler: [`results/`](results/README.md).
+
+| Model | Kahramanmaraş 2023 (8 kayıt) | Türkiye Mw ≥ 6 (18 deprem, 54 kayıt) | Tüm KOERI (332 deprem, 949 kayıt) |
+|---|---|---|---|
+| Eski formül (doğrulanmamış) | −1,60 · 1,81 | −2,36 · 2,45 | −2,64 · 2,69 |
+| Allen 2012 · Rhyp | +0,14 · 0,76 | −0,61 · 0,89 | −0,59 · 0,77 |
+| Allen 2012 · Rrup | +0,40 · 0,77 | −0,57 · 0,89 | −1,22 · 1,32 |
+| Bayrak 2019 · R3 | +0,12 · 0,64 | −1,63 · 1,91 | −2,52 · 2,60 ¹ |
+| **Kale 2015 → WGRW12** | +0,67 · 0,91 | **−0,17 · 0,69** | **−0,42 · 0,68** |
+| Kale 2015 → Bilal & Askan 2014 | +0,00 · 0,70 | +0,20 · 0,96 | +0,73 · 1,06 |
+| Mantık ağacı (ortalama) | +0,38 · 0,71 | −0,48 · 0,80 | −0,85 · 0,98 |
+
+<sub>Hücreler: sapma · RMSE (MMI). ¹ Bayrak 2019, MMI ≥ 4 ve Mw ≥ 4.5 için türetildi; tüm-KOERI kümesinin büyük kısmı bu aralığın dışında.</sub>
+
+<p align="center"><img src="results/residual_distance_m6.png" width="100%"></p>
+
+**Bulgular**
+
+1. **Eski formül her uzaklıkta sistematik olarak fazla tahmin ediyor.** Tüm KOERI kümesinde sapma 0–25 km'de −1,9 iken 100–400 km'de −2,8'e çıkıyor (`results/metrics_koeri_all_by_distance.csv`). Eski formül şiddeti uzaklıkla çok yavaş azaltıyor.
+2. **GMPE + GMICE zinciri en dengeli model.** Türkiye'ye özgü GMPE, zemin terimini de içerdiği için büyük depremlerde sapma −0,17'de kalıyor.
+3. **Büyük depremlerde nokta kaynak yanıltıcı.** Bayrak 2019, Mw ≥ 6 kümesinde 1,6 MMI fazla tahmin ediyor. Episantral uzaklık kullandığı için fay boyunca uzanan sarsıntıyı temsil edemiyor.
+4. **Enstrümantal "gözlem" de bir modele bağlı.** Aynı PGV'ler Bilal & Askan ile MMI'ya çevrildiğinde RMSE 0,5–1 MMI artıyor (`results/sensitivity_observed_gmice.csv`). Bu döngüselliği kırmak için DYFI ve saha verisi gerekiyor (bkz. sınırlılıklar).
+
+## Makine öğrenmesi: artık modeli
+
+Literatürün önerdiği hibrit yapı uygulandı: `MMI = MMI_fizik + f_LightGBM(özellikler)`. Omurga Kale 2015 → WGRW12'dir. LightGBM `init_score` ile yalnızca artığı öğrenir. Mw (+), Rrup (−) ve Vs30 (−) üzerinde **monotonluk kısıtları** vardır, bu yüzden toplam tahmin fiziksel olarak tutarlı kalır. Doğrulama, deprem bazında gruplandırılmış 5 katlı **GroupKFold** ile yapıldı; gruplar, kayıt pencereleri örtüşen depremleri de birleştirir.
+
+| Küme | Omurga | + sabit kaydırma | **+ LightGBM** |
+|---|---|---|---|
+| Tümü (deprem bazlı CV) | 0,68 | 0,54 | **0,45** |
+| Tümü (istasyon bazlı CV) | 0,68 | 0,55 | **0,49** |
+| Mw ≥ 6 | 0,69 | 0,71 | **0,65** |
+| Rrup ≤ 50 km | 0,59 | 0,70 | **0,53** |
+
+<sub>Katman dışı RMSE (MMI). Ayrıntı: [`results/ml/`](results/ml/README.md).</sub>
+
+<p align="center"><img src="results/ml/shap_summary.png" width="60%"></p>
+
+- Basit bir sabit düzeltme, küçük depremlerdeki genel sapmayı giderir ama **büyük depremleri ve yakın mesafeyi bozar**. LightGBM bunu büyüklüğe ve uzaklığa bağlı öğrendiği için bu sorunu yaşamaz.
+- SHAP'a göre en büyük katkı konumdan (bölgesel yol ve istasyon etkileri) ve uzaklıktan geliyor. **Vs30'un ek bilgisi yok.** Bu, literatür taramasındaki "zemin düzeltmesinin etkisi belirsiz" boşluğuna ilk sayısal katkıdır.
+
+## Nüfus maruziyeti
+
+USGS PAGER mantığıyla, tahmin edilen MMI sınıflarına göre nüfus toplanır. Kahramanmaraş Mw 7.8 senaryosu (sonlu fay, Vs30 = 760 m/s, episantrın ±3° çevresi, Suriye dahil):
+
+| MMI | %16 | Medyan | %84 |
+|---|---|---|---|
+| V | 9 679 190 | 11 397 279 | 3 660 996 |
+| VI | 1 352 247 | 9 482 003 | 10 039 265 |
+| VII | 534 663 | 1 730 637 | 7 147 940 |
+| VIII | 0 | 570 603 | 3 755 596 |
+| IX | 0 | 0 | 879 707 |
+
+<sub>Nüfus: GeoNames ≥ 15 000 nüfuslu yerleşimler (kırsal nüfus hariç, bu yüzden PAGER değerlerinden düşüktür). GHSL ya da TÜİK rasteri `exposure(..., raster=...)` ile kullanılabilir. Tam tablo: `results/kahramanmaras_exposure.csv`.</sub>
+
+Katmanlı harita (`results/kahramanmaras_map.html`) şu katmanları içerir: medyan, %16, %84, σ, P(≥VII), P(≥VIII), fay, istasyon gözlemleri ve yerleşimler.
+
+## Kurulum ve çalıştırma
 
 ```bash
+git clone https://github.com/Memreu/deprem-mesafe-etki-analizi.git
+cd deprem-mesafe-etki-analizi
 pip install -r requirements.txt
+pip install --no-deps openquake.engine==3.26.2   # hazardlib; GDAL derlemesini atlamak için bağımlılıksız
 ```
 
+**Komut satırı**
+
+```bash
+python "1.1.MMI Intensity Mapper.py"            # etkileşimli (ondalık ya da DMS koordinat)
+python -m mmi_mapper.cli --mag 7.8 --lat 37.2256 --lon 37.0143 --depth 10 \
+       --site 37.5753,36.9228 --site 36.2023,36.1613 --vs30 400
+```
+
+**Arayüz, not defteri ve çoğaltma**
+
+```bash
+streamlit run app/streamlit_app.py              # harita, maruziyet, nokta sorgusu, mantık ağacı ağırlıkları
+jupyter lab notebooks/kahramanmaras_demo.ipynb  # uçtan uca demo (çıktılarıyla)
+python scripts/run_benchmark.py                 # Aşama 3: results/ tabloları ve grafikleri
+python scripts/train_residual_model.py          # Aşama 4: LightGBM + SHAP
+python scripts/make_figures.py                  # README görselleri, maruziyet tablosu, katmanlı harita
+pytest -q                                       # 24 test
+```
+
+**Ek veriyle genişletme**
+
+```bash
+python scripts/download_data.py usgs us6000jllz          # DYFI, ShakeMap istasyonları, rupture.json, FFM
+python scripts/download_data.py vs30 --url <GeoTIFF>     # USGS Global Vs30 Mosaic
+# AFAD TADAS tablosu → data/raw/us6000jllz/afad_stations.csv (station, lat, lon, pgv_cms)
+# Saha haritası     → data/raw/us6000jllz/field_map.csv     (lat, lon, mmi)
+```
+
+Bu dosyalar mevcutsa `run_benchmark.py` onları Kahramanmaraş karşılaştırmasına otomatik olarak ekler ve FFM'yi sonlu fay olarak kullanır.
+
+## Klasör yapısı
+
+```
+├── 1.1.MMI Intensity Mapper.py     # Etkileşimli giriş noktası
+├── mmi_mapper/
+│   ├── ipe.py                      # Allen 2012, Bayrak 2019, eski formül (doğrulanmamış)
+│   ├── gmpe.py · gmice.py          # OpenQuake Kale 2015 · WGRW12, Bilal & Askan 2014
+│   ├── rupture.py                  # Nokta / sonlu fay, GEM + Thingbaijam, Rjb–Rrup
+│   ├── site.py                     # Vs30 rasteri, NEHRP sınıfı
+│   ├── model.py · grid.py          # Senaryo ve ızgara hesabı
+│   ├── uncertainty.py              # Mantık ağacı, çeyreklikler, aşma olasılığı
+│   ├── observations.py · benchmark.py   # Gözlem yükleyicileri, metrikler, grafikler
+│   ├── ml.py                       # LightGBM artık modeli
+│   ├── exposure.py · mapping.py    # PAGER tablosu, katmanlı folium haritası
+│   └── cli.py · scale.py · coords.py
+├── app/streamlit_app.py
+├── notebooks/kahramanmaras_demo.ipynb
+├── scripts/                        # benchmark, ML, görseller, veri indirme
+├── data/faults/                    # GEM aktif fay izleri (CC BY-SA 4.0)
+├── data/observations/              # KOERI kuvvetli yer hareketi tablosu
+├── results/                        # Benchmark ve ML çıktıları
+├── docs/                           # Literatür taraması, mantık ağacı
+├── tests/                          # pytest (OpenQuake karşılaştırmaları dahil)
+└── .github/workflows/tests.yml     # GitHub Actions
+```
+
+## Veri ve lisanslar
+
+| Veri | Kaynak | Lisans |
+|---|---|---|
+| Aktif fay izleri | GEM Global Active Faults (Styron & Pagani 2020) | CC BY-SA 4.0 |
+| Kuvvetli yer hareketi | KOERI / ORFEUS-EIDA, [turkiye-deprem-verisi](https://github.com/Ayberkrk/turkiye-deprem-verisi) üzerinden | Yalnızca akademik / ticari olmayan kullanım |
+| İstasyon Vs30 | USGS Global Vs30 Mosaic | Kamu malı |
+| Yerleşim nüfusu | GeoNames (`geonamescache`) | CC BY 4.0 |
+
+Ayrıntılar: [`data/faults/README.md`](data/faults/README.md), [`data/observations/README.md`](data/observations/README.md).
+
+## Sınırlılıklar ve sonraki adımlar
+
+- **Kahramanmaraş gözlemleri az.** Geliştirme ortamında USGS ve AFAD sunucularına erişilemediği için Kahramanmaraş benchmark'ı yalnızca 8 KOERI kaydına dayanıyor. Yükleyiciler ve indirme betiği hazır; DYFI (us6000jllz), AFAD istasyonları ve Albayrak vd. (2024) saha haritası eklendiğinde karşılaştırma yenilenmeli.
+- **Vs30 rasteri** repoya dahil değil. Harita senaryolarında raster indirilene kadar 760 m/s kullanılıyor.
+- **KOERI veri seti:** kaynak belgesine göre PGA'lar Akkar vd. (2014)'e göre log10'da ~0,24 düşük. Tüm-KOERI kümesindeki negatif sapmanın bir kısmı buradan gelebilir.
+- **Kabul edilen varsayımlar:** Bayrak 2019'da log tabanı (log10) ve σY'nin toplam sigma olduğu; Bilal & Askan 2014 için σ_GMICE = 0,63 (WGRW12'den vekil); GEM izlerinde sağ el eğim kuralı; GMPE geometrik ortalama bileşeni ile GMICE bileşeni arasında dönüşüm yapılmaması.
+- **Yakın alan:** Fay üzerindeki yerleşimlerde medyan tahmin VIII civarında kalıyor. Fayın 13 km yakınındaki KHMN istasyonunda gözlem 9,2, mantık ağacı medyanı 8,2. Yönelim (directivity) ve havza etkileri modelde yok.
+- **Sonraki adımlar:** DYFI ve AFAD ile benchmark'ı genişletmek; kalan artıklar için uzamsal Gauss süreci; Elazığ 2020 ve Düzce 1999'u benchmark setine eklemek; Türkiye için Rrup tabanlı bir IPE kalibre etmek (literatür boşluğu #2).
+
+## Kaynaklar
+
+- Allen, T.I., Wald, D.J., Worden, C.B. (2012). Intensity attenuation for active crustal regions. *J. Seismology* 16, 409–433. doi:10.1007/s10950-012-9278-7
+- Bayrak, E., Nas, M., Bayrak, Y. (2019). New macroseismic intensity predictive models for Turkey. *Acta Geophysica* 67, 1483–1513. doi:10.1007/s11600-019-00357-4
+- Kale, Ö., Akkar, S., Ansari, A., Hamzehloo, H. (2015). A ground-motion predictive model for Iran and Turkey. *BSSA* 105(2A), 963–980.
+- Worden, C.B., Gerstenberger, M.C., Rhoades, D.A., Wald, D.J. (2012). Probabilistic relationships between ground-motion parameters and MMI in California. *BSSA* 102(1), 204–221. doi:10.1785/0120110156
+- Bilal, M., Askan, A. (2014). Relationships between felt intensity and recorded ground-motion parameters for Turkey. *BSSA* 104(1), 484–496. doi:10.1785/0120130093
+- Thingbaijam, K.K.S., Mai, P.M., Goda, K. (2017). New empirical earthquake source-scaling laws. *BSSA* 107(5), 2225–2246. doi:10.1785/0120170017
+- Styron, R., Pagani, M. (2020). The GEM Global Active Faults Database. *Earthquake Spectra* 36(S1), 160–180. doi:10.1177/8755293020944182
+- Jaiswal, K., Wald, D.J. (2010). An empirical model for global earthquake fatality estimation. *Earthquake Spectra* 26(4), 1017–1037.
+- Pagani, M. vd. (2014). OpenQuake Engine: an open hazard (and risk) software for the Global Earthquake Model. *SRL* 85(3), 692–702.
+- Tam kaynakça: [`docs/literatur_taramasi.pdf`](docs/literatur_taramasi.pdf)
+
 ---
 
-## 🚀 Kullanım
-Uygulama çalıştırıldığında:
-- 1.Depremin episantr koordinatlarını girin (örn: 39°49'39.0"N 30°32'26.9"E)
-- 2.Birden fazla analiz yapılacak konum ekleyin.
-- 3.Depremin derinliği ve moment büyüklüğünü (Mw) girin.
+Bu proje [MIT lisansı](LICENSE) ile paylaşılmaktadır. `data/` altındaki veriler kendi lisanslarına tabidir.
 
-Sonuçlar:
-- 📊 Terminalde açıklamalı olarak sunulur.
-- 🗺️ Harita üzerinde görsel olarak sunulur. (deprem_haritasi.html)
-- Harita, çalıştırılan dizine kaydedilir ve otomatik olarak tarayıcıda açılır.
-
---- 
-
-## 📸 Örnek Harita Çıktısı
-Harita açıklamaları:
-- 🔴 Kırmızı: Deprem merkez üssü
-- 🔵 Mavi: Kullanıcı konumları
-- 🟠 Turuncu çizgiler: Merkez ile konum arasındaki bağlantılar
-- 💬 Popup: Tahmini MMI ve mesafe bilgileri
-![image](https://github.com/user-attachments/assets/f2819266-d82e-41e2-9196-3a1448202527)
-
----
-
-## 📚 Teorik Arka Plan
-
-Bir konumdaki şiddeti tahmin etmenin kabul görmüş iki yolu vardır: büyüklük ve uzaklıktan doğrudan şiddet veren **şiddet tahmin denklemleri (IPE)** ya da önce yer hareketini (PGV) tahmin edip bunu şiddete çeviren **GMPE + GMICE zinciri**. Ayrıntılar: [`docs/literatur_taramasi.pdf`](docs/literatur_taramasi.pdf).
-
-**Kullanılan IPE'ler** (`mmi_mapper/ipe.py`):
-
-| Model | Uzaklık | Denklem | σ (MMI) |
-|---|---|---|---|
-| Allen, Wald & Worden (2012), Rrup | fay uzaklığı | `3.950 + 0.913·M − 1.107·ln√(Rrup² + (1 + 0.813·e^(M−5))²)` | `0.72 + 0.23/(1+(R/44.7)²)` |
-| Allen, Wald & Worden (2012), Rhyp | hiposantral | `2.085 + 1.428·M − 1.402·ln√(Rhyp² + Rm²) + 0.078·ln(Rhyp/50)` (R>50 km), `Rm = −0.209 + 2.042·e^(M−5)` | `0.82 + 0.37/(1+(R/22.9)²)` |
-| Bayrak, Nas & Bayrak (2019), R3 — Türkiye | episantral + derinlik | `7.494 + 0.744·Mw − 3.377·log((Repi³+h³)^(1/3)) + 0.017·h` | 1.270 |
-
-Allen 2012 katsayıları OpenQuake `AllenEtAl2012` / `AllenEtAl2012Rhypo` sınıflarından, Bayrak 2019 katsayıları makalenin Tablo 4'ünden alınmıştır (R1–R4 dördü de kodda mevcuttur). Bayrak 2019'da logaritmanın tabanı açıkça belirtilmediği için log10 varsayılmıştır.
-
-> ⚠️ **Eski formül kaldırıldı.** İlk sürümdeki `MMI = 1.62 + 1.22·Mw − 0.00255·R − 1.29·log10(R)` için yayımlanmış bir kaynak bulunamadı. Allen vd. (2012)'ye göre 100–300 km aralığında şiddeti **1,6–2,2 MMI fazla** tahmin ediyor (bkz. `tests/test_ipe.py`). Yalnızca karşılaştırma için `legacy_unverified` adıyla tutulur.
->
-> **MMI → Mw dönüşümü kaldırıldı.** Büyüklük depremin, şiddet konumun özelliğidir. Bir noktadaki şiddetten depremin büyüklüğü geri hesaplanamaz.
-
----
-## 📖 Literatür Taraması
-
-Projenin teorik temeli için hazırlanan kapsamlı literatür taraması: [`docs/literatur_taramasi.pdf`](docs/literatur_taramasi.pdf) (29 sayfa). Şiddet tahmin denklemleri (IPE), GMPE + GMICE zinciri, Türkiye'ye özgü modeller, zemin etkisi (Vs30), sonlu fay, belirsizlik, ShakeMap/AFAD/KOERI, Kahramanmaraş 2023 dersleri ve aşamalı geliştirme yol haritasını kapsar.
-
-## 🔗 Kaynaklar ve Referanslar
-
-- 📊 AFAD Türkiye Deprem Tehlike Haritası (TDTH)
-- 🧭 MTA Yerbilimleri Veri Portalı
-- 📘 USGS MMI Açıklamaları
-- 📄 Boore et al. (1997) — Zemin ivme tahmin denklemleri (GMPE)
-
----
-
-## 🤝 Katkı
-Her türlü katkıya açığız! Şunları yapabilirsin:
-
-- 📥 Gerçek PGA ve zemin verileriyle entegrasyon
-- 🌍 Raster veri destekli analiz (AFAD WMS, MTA TIFF)
-- 🖼️ GUI arayüz geliştirme (Tkinter, PyQt)
-- 📄 PDF rapor çıktısı oluşturma
-
----
-
-## 🧠 Lisans
-- MIT Lisansı ile lisanslanmıştır.
-- Lütfen AFAD ve MTA kaynaklarını kullandığınızda uygun atıfta bulunun.
-
-
----
-
-> - 👨‍💻 Hazırlayan: Mehmet Emre Ünlü
-- 📅 Proje Başlangıcı: 2025
-- 📍 Türkiye
+**Mehmet Emre Ünlü** · [GitHub](https://github.com/Memreu) · [LinkedIn](https://www.linkedin.com/in/memreu) · [Kaggle](https://www.kaggle.com/memreu)
