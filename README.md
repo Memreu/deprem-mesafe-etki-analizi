@@ -216,7 +216,7 @@ pip install --no-deps openquake.engine==3.26.2   # hazardlib; GDAL derlemesini a
 **Komut satırı**
 
 ```bash
-python "1.1.MMI Intensity Mapper.py"            # etkileşimli (ondalık ya da DMS koordinat)
+python -m mmi_mapper                            # etkileşimli (ondalık ya da DMS koordinat)
 python -m mmi_mapper.cli --mag 7.8 --lat 37.2256 --lon 37.0143 --depth 10 \
        --site 37.5753,36.9228 --site 36.2023,36.1613 --vs30 400
 ```
@@ -247,7 +247,6 @@ Altı depremin USGS gözlemleri, fayları ve Türkiye Vs30 rasteri repoda hazır
 ## Klasör yapısı
 
 ```
-├── 1.1.MMI Intensity Mapper.py     # Etkileşimli giriş noktası
 ├── mmi_mapper/
 │   ├── ipe.py                      # Allen 2012, Bayrak 2019, eski formül (doğrulanmamış)
 │   ├── gmpe.py · gmice.py          # OpenQuake Kale 2015 · WGRW12, Bilal & Askan 2014

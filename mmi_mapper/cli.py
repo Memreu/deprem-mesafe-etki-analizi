@@ -1,6 +1,6 @@
 """Komut satırı arayüzü.
 
-Etkileşimli:   python "1.1.MMI Intensity Mapper.py"
+Etkileşimli:   python -m mmi_mapper
 Argümanlarla:  python -m mmi_mapper.cli --mag 7.8 --lat 37.226 --lon 37.014 --depth 10 \
                    --site 37.5753,36.9228 --site 36.2023,36.1613
 """
