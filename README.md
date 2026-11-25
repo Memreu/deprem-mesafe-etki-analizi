@@ -20,6 +20,44 @@ Olmuş bir depremin büyüklüğü, konumu ve derinliğinden, farklı noktalarda
 
 > Bu araç **olmuş bir depremin etkisini** tahmin eder. Gelecekteki depremlerin zamanını, yerini ya da büyüklüğünü **tahmin etmez**.
 
+## 🤔 Bu nedir? (Teknik olmayan özet)
+
+Bir deprem olduğunda haberlerde önce **büyüklüğü** duyarız: "7,8". Ama bu sayı depremin kendisini anlatır, **sizin bulunduğunuz yerde sarsıntının ne kadar sert hissedildiğini** anlatmaz. Aynı deprem fayın dibindeki bir şehirde binaları yıkarken 300 km ötede yalnızca avizeleri sallayabilir.
+
+Yerel sarsıntı **şiddet** ile ölçülür. Bu projede kullanılan ölçek, I'den XII'ye giden **Mercalli (MMI)** ölçeğidir:
+
+| Şiddet | Kabaca ne olur? |
+|---|---|
+| II–III | Yalnızca içeride, durgun duran bazı kişiler hisseder |
+| IV–V | Çoğu kişi hisseder, camlar ve eşyalar tıngırdar, uyuyanlar uyanır |
+| VI | Herkes hisseder, eşyalar devrilir, sıvalar çatlar |
+| VII | Ayakta durmak zorlaşır, zayıf binalarda hasar başlar |
+| VIII | Sıradan binalarda ciddi hasar, kısmi çökmeler |
+| IX ve üstü | Yaygın yıkım |
+
+**Bu araç ne yapar?** Depremin büyüklüğünü, yerini ve derinliğini verirsiniz; araç da istediğiniz noktalarda (ya da bütün bölge için bir harita olarak) sarsıntının **hangi şiddette** hissedilmiş olabileceğini tahmin eder. Bunu yaparken şunları hesaba katar:
+
+- **Faya olan uzaklık.** Büyük depremlerde kırılma tek bir noktada değil, yüzlerce km'lik bir fay boyunca olur. Kahramanmaraş 2023'te fay yaklaşık 300 km uzunluğundaydı. Araç bu yüzden uzaklığı episantra (merkez üssü) göre değil, fayın kendisine göre ölçer.
+- **Zemin.** Yumuşak zemin sarsıntıyı büyütür, kaya zemin azaltır.
+- **Belirsizlik.** Tek bir sayı yerine "büyük olasılıkla VII, ama VI ile VIII arası da olabilir" gibi bir aralık ve "şiddetin VIII'i aşma olasılığı %40" gibi olasılıklar verir.
+- **Etkilenen nüfus.** Hangi şiddette kaç kişinin yaşadığını yaklaşık olarak hesaplar.
+
+**Neden önemli?** Deprem sonrasındaki ilk saatlerde ekipler ve karar vericiler "en çok nereler etkilendi?" sorusunun cevabını arar. Bu tür hızlı şiddet haritaları (ABD'de USGS'in ShakeMap ve PAGER ürünleri gibi) yardımın nereye öncelikle gideceğine karar vermeye yardım eder. Bu proje aynı fikrin Türkiye'ye odaklanan, açık kaynaklı ve sonuçları gerçek gözlemlerle karşılaştırılmış bir sürümüdür.
+
+**Ne kadar güvenilir?** Araç, Türkiye ve çevresindeki altı büyük depremde (Kahramanmaraş 2023 ×2, Elazığ 2020, Sisam 2020, Düzce 1999, İzmit 1999) 1 324 gerçek gözlemle sınandı. Bu gözlemler halkın "Hissettiniz mi?" anketleri, deprem istasyonlarının kayıtları ve saha incelemelerinden geliyor:
+
+- Tahminler **ortalama olarak yaklaşık bir şiddet derecesi** sapıyor. Gözlemlerin **%72'sinde** hata bir dereceden az, **%88'inde** tahmin edilen derece ya tam isabet ya da bir derece komşusu. Hatanın iki dereceyi aştığı durumlar %3.
+- Projenin ilk sürümündeki eski formül şiddeti **ortalama iki derece fazla** gösteriyordu ve gözlemlerin yarısından fazlasında iki dereceden fazla yanılıyordu.
+- Verilen aralıklar da gerçekçi: "VII'yi aşma olasılığı %80" denen yerlerde gerçekten yaklaşık %80 oranında VII ve üstü görülmüş.
+
+**Sınırları:**
+
+- **En şiddetli bölgelerde sarsıntıyı biraz az tahmin ediyor.** Gerçekte VIII ve üstü yaşanan yerlerde tahmin ortalama 0,8 derece düşük kalıyor. Fayın dibindeki ilk 50 km de en zor bölge.
+- **Bina hasarını ya da can kaybını tahmin etmez.** Şiddet sarsıntının sertliğidir; hasar binanın sağlamlığına da bağlıdır.
+- **Resmî bir uyarı ya da afet yönetimi aracı değildir.** Araştırma ve eğitim amaçlıdır. Gerçek bir deprem sonrasında AFAD'ın ve resmî kurumların açıklamalarını esas alın.
+
+Teknik ayrıntılar aşağıdadır.
+
 <p align="center"><img src="images/kahramanmaras_mmi_map.png" width="100%"></p>
 
 > 🇬🇧 **In English:** A lightweight, documented and validated rapid-intensity tool for Türkiye. It replaces an unsourced legacy formula with published models: Allen, Wald & Worden (2012) and Bayrak et al. (2019) IPEs, plus a Kale et al. (2015) GMPE → Worden et al. (2012) / Bilal & Askan (2014) GMICE chain run through OpenQuake. Large events use a finite fault built from GEM active-fault traces and Thingbaijam et al. (2017) scaling. A four-branch logic tree yields 16/50/84th percentiles and P(MMI ≥ VII/VIII). Across six large earthquakes (Kahramanmaraş 2023 ×2, Elazığ 2020, Samos 2020, Düzce 1999, İzmit 1999; 1,324 USGS DYFI, field-intensity and strong-motion observations), the legacy formula over-predicts by **2.0 MMI** (RMSE 2.29), while the logic tree has a bias of **−0.11** (RMSE 0.93). Within 50 km of the fault, the automatically built GEM-based rupture (logic-tree RMSE 1.24) performs almost as well as the USGS rupture (1.17), whereas a point source gives 1.59; for Kahramanmaraş alone the values are 1.10, 1.07 and 2.26. A monotonic-constrained LightGBM residual model, validated with event-grouped CV, lowers out-of-fold RMSE from **0.68 to 0.45** across 949 records. Outputs include a PAGER-style population exposure table, a layered Folium map, a Streamlit app and CI tests that check the IPEs against OpenQuake.
@@ -27,6 +65,7 @@ Olmuş bir depremin büyüklüğü, konumu ve derinliğinden, farklı noktalarda
 <details>
 <summary><b>📑 İçindekiler</b></summary>
 
+- [Bu nedir? (Teknik olmayan özet)](#-bu-nedir-teknik-olmayan-özet)
 - [Öne çıkan sonuçlar](#öne-çıkan-sonuçlar)
 - [Neden yeniden yazıldı?](#neden-yeniden-yazıldı)
 - [Yöntem](#yöntem)
