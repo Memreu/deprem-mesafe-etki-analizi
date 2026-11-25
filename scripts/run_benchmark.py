@@ -27,14 +27,11 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from mmi_mapper import benchmark as B  # noqa: E402
+from mmi_mapper import events as E  # noqa: E402
 from mmi_mapper import observations as O  # noqa: E402
 from mmi_mapper.model import Event  # noqa: E402
-from mmi_mapper.rupture import build_rupture  # noqa: E402
 
 RES = ROOT / "results"
-RAW = ROOT / "data" / "raw"
-USGS_OBS = ROOT / "data" / "observations" / "usgs_observations.csv"
-EVENTS = ROOT / "data" / "events.csv"
 KAHRAMANMARAS = ["us6000jllz", "us6000jlqa"]
 SHOW = ("legacy", "allen2012_rrup", "bayrak2019", "kale2015_wgrw12", "lt_mean")
 
@@ -49,36 +46,18 @@ def event_from_koeri(d: pd.DataFrame, eid: str) -> Event:
     return Event(mag=float(r.mw), lat=float(r.ev_lat), lon=float(r.ev_lon), depth=float(r.ev_depth_km), event_id=eid)
 
 
-def usgs_events() -> pd.DataFrame:
-    return pd.read_csv(EVENTS).set_index("event_id")
-
-
-def usgs_observations(eid: str) -> pd.DataFrame:
-    u = pd.read_csv(USGS_OBS)
-    parts = [u[u.event_id == eid].drop(columns=["event_id"])]
-    folder = RAW / eid
-    if (folder / "afad_stations.csv").exists():
-        parts.append(O.load_afad_csv(folder / "afad_stations.csv"))
-    if (folder / "field_map.csv").exists():
-        parts.append(O.load_field_map(folder / "field_map.csv"))
-    return pd.concat(parts, ignore_index=True)
+usgs_events = E.load_events
 
 
 def run_usgs_events(event_ids, geometry="auto"):
     """``geometry``: 'auto' (data/events.csv'deki seçim), 'gem' (GEM + Thingbaijam) ya da 'point'."""
-    evs = usgs_events()
+    evs = E.load_events()
     parts, rups = [], {}
     for eid in event_ids:
-        e = evs.loc[eid]
-        ev = Event(mag=float(e.mag), lat=float(e.lat), lon=float(e.lon), depth=float(e.depth_km), event_id=eid)
-        if geometry == "point":
-            rup = build_rupture(ev.mag, ev.lat, ev.lon, ev.depth, use_finite=False)
-        elif geometry == "gem" or not isinstance(e.get("rupture_file"), str):
-            rup = build_rupture(ev.mag, ev.lat, ev.lon, ev.depth)
-        else:
-            rup = build_rupture(ev.mag, ev.lat, ev.lon, ev.depth, rupture_geojson=ROOT / e.rupture_file)
-        res, rup = B.predict_for_observations(ev, usgs_observations(eid), rupture=rup)
-        res["event_id"], res["event"] = eid, e["name"]
+        ev = E.get_event(eid, evs)
+        rup = E.event_rupture(eid, geometry, evs)
+        res, rup = B.predict_for_observations(ev, E.usgs_observations(eid), rupture=rup)
+        res["event_id"], res["event"] = eid, evs.loc[eid, "name"]
         parts.append(res)
         rups[eid] = rup
     return pd.concat(parts, ignore_index=True), rups

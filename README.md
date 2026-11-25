@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/OpenQuake-hazardlib_3.26-1F6FB2" alt="OpenQuake">
   <img src="https://img.shields.io/badge/LightGBM-monoton_artık_modeli-9ACD32" alt="LightGBM">
   <img src="https://img.shields.io/badge/RMSE-0.68→0.45_MMI-29A36A" alt="RMSE">
-  <img src="https://img.shields.io/badge/test-25_geçti-2EA44F?logo=pytest&logoColor=white" alt="Testler">
+  <img src="https://img.shields.io/badge/test-31_geçti-2EA44F?logo=pytest&logoColor=white" alt="Testler">
   <img src="https://img.shields.io/badge/lisans-MIT-lightgrey" alt="MIT">
 </p>
 
@@ -211,25 +211,30 @@ git clone https://github.com/Memreu/deprem-mesafe-etki-analizi.git
 cd deprem-mesafe-etki-analizi
 pip install -r requirements.txt
 pip install --no-deps openquake.engine==3.26.2   # hazardlib; GDAL derlemesini atlamak için bağımlılıksız
+pip install --no-deps -e .                       # mmi-mapper komutu
 ```
+
+Bağımlılıklar `pyproject.toml`'da da tanımlı: `pip install -e ".[dev]"` (ML ve Streamlit dahil) ya da yalnızca çekirdek için `pip install -e .`. CI, Python 3.11, 3.12 ve 3.13'te çalışır.
 
 **Komut satırı**
 
 ```bash
-python -m mmi_mapper                            # etkileşimli (ondalık ya da DMS koordinat)
-python -m mmi_mapper.cli --mag 7.8 --lat 37.2256 --lon 37.0143 --depth 10 \
+mmi-mapper                                      # etkileşimli (ondalık ya da DMS koordinat); python -m mmi_mapper de olur
+mmi-mapper --mag 7.8 --lat 37.2256 --lon 37.0143 --depth 10 \
        --site 37.5753,36.9228 --site 36.2023,36.1613 --vs30 400
+mmi-mapper --list-events                        # benchmark'taki altı deprem
+mmi-mapper --event us6000jllz --site 37.5753,36.9228   # olay parametreleri ve USGS fayı data/events.csv'den
 ```
 
 **Arayüz, not defteri ve çoğaltma**
 
 ```bash
-streamlit run app/streamlit_app.py              # harita, maruziyet, nokta sorgusu, mantık ağacı ağırlıkları
+streamlit run app/streamlit_app.py              # altı deprem, fay seçimi, harita, maruziyet, gözlem karşılaştırması
 jupyter lab notebooks/kahramanmaras_demo.ipynb  # uçtan uca demo (çıktılarıyla)
 python scripts/run_benchmark.py                 # Aşama 3: results/ tabloları ve grafikleri
 python scripts/train_residual_model.py          # Aşama 4: LightGBM + SHAP
 python scripts/make_figures.py                  # README görselleri, maruziyet tablosu, katmanlı harita
-pytest -q                                       # 25 test
+pytest -q                                       # 31 test (Streamlit arayüzü dahil)
 ```
 
 **Ek veriyle genişletme**
@@ -256,6 +261,7 @@ Altı depremin USGS gözlemleri, fayları ve Türkiye Vs30 rasteri repoda hazır
 │   ├── uncertainty.py              # Mantık ağacı, çeyreklikler, aşma olasılığı
 │   ├── observations.py · benchmark.py   # Gözlem yükleyicileri, metrikler, grafikler
 │   ├── ml.py                       # LightGBM artık modeli
+│   ├── events.py                   # Benchmark depremleri: olay tablosu, fay seçimi, gözlemler
 │   ├── exposure.py · mapping.py    # PAGER tablosu, katmanlı folium haritası
 │   └── cli.py · scale.py · coords.py
 ├── app/streamlit_app.py

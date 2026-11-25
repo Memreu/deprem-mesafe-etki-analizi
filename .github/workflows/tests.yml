@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -22,7 +22,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install --no-deps openquake.engine==3.26.2
+          pip install --no-deps -e .
       - name: Testler (Allen 2012 ve fay uzaklıkları OpenQuake ile karşılaştırılır)
         run: pytest -q
+      - name: Komut satırı duman testi
+        run: mmi-mapper --mag 7.8 --lat 37.2256 --lon 37.0143 --site 37.5753,36.9228 --html "" --no-browser
       - name: Benchmark betiği duman testi
         run: python scripts/run_benchmark.py > /dev/null
